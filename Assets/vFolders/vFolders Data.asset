@@ -13,5 +13,83 @@ MonoBehaviour:
   m_Name: vFolders Data
   m_EditorClassIdentifier: 
   folderDatasByGuid:
-    keys: []
-    values: []
+    keys:
+    - 00000000000000001000000000000000
+    - 3c2dd971c2e950b8aa9770a967ea5ec2
+    - b866baf084fd4f50495fa1cf8ad56823
+    - 109e9bdd0fcc649c5bc59085c35bdc83
+    - 0220aab0833d04faeb927d84ca6cc40c
+    - 43993a027b2154c03af2a8d5df779c94
+    - 0e0162ac614514845a377dee6a21ab99
+    - c184aa0530bb11baaae85de17573ccbb
+    - 9c738d7c5d456775880eb27ef913d109
+    - 56188375a64acee90b047c4bbb93291b
+    - 1766c189415f523fe976e926f43ded91
+    - 82423786c43941f18a678a1786c56b26
+    - 14ab43e94c76a6b4d970ce0790abd462
+    values:
+    - guid: 00000000000000001000000000000000
+      iColor: 0
+      autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: 3c2dd971c2e950b8aa9770a967ea5ec2
+      iColor: 0
+      autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: b866baf084fd4f50495fa1cf8ad56823
+      iColor: 0
+      autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: 109e9bdd0fcc649c5bc59085c35bdc83
+      iColor: 0
+      autoIcon: SceneAsset Icon
+      customIcon: 
+      autoIconDirty: 0
+    - guid: 0220aab0833d04faeb927d84ca6cc40c
+      iColor: 0
+      autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: 43993a027b2154c03af2a8d5df779c94
+      iColor: 0
+      autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: 0e0162ac614514845a377dee6a21ab99
+      iColor: 0
+      autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: c184aa0530bb11baaae85de17573ccbb
+      iColor: 0
+      autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: 9c738d7c5d456775880eb27ef913d109
+      iColor: 0
+      autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: 56188375a64acee90b047c4bbb93291b
+      iColor: 0
+      autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: 1766c189415f523fe976e926f43ded91
+      iColor: 0
+      autoIcon: cs Script Icon
+      customIcon: 
+      autoIconDirty: 1
+    - guid: 82423786c43941f18a678a1786c56b26
+      iColor: 0
+      autoIcon: 
+      customIcon: 
+      autoIconDirty: 0
+    - guid: 14ab43e94c76a6b4d970ce0790abd462
+      iColor: 0
+      autoIcon: cs Script Icon
+      customIcon: 
+      autoIconDirty: 1
