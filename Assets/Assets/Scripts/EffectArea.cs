@@ -11,39 +11,20 @@ public class ZoneEffectSimple : MonoBehaviour
     [Range(0, 100)] public float chancePercent = 30f;
     public float interval = 5f;
 
-    [Header("Sterowanie do wyłączenia (zamiast stringa)")]
-    [Tooltip("Jeśli przypięte – wyłączy dokładnie TEN komponent (np. z obiektu gracza w scenie).")]
-    public Behaviour disableThisExactComponent;
-
-    [Tooltip("Jeśli przypięte – użyje TYLKO TYPU tego komponentu (np. z prefabu) i wyszuka go na graczu.")]
-    public Behaviour componentTypeReference;
-
-    [Tooltip("Szukaj komponentu również w dzieciach gracza.")]
+    [Header("Sterowanie do wyłączenia (opcjonalne)")]
+    public Behaviour disableThisExactComponent;   // wyłączy dokładnie ten komponent
+    public Behaviour componentTypeReference;      // albo wyłączy komponent po typie znaleziony na graczu
     public bool searchInChildren = true;
 
-    [Header("Efekt – cel (bird)")]
-    [Tooltip("Jeśli ustawiony i aktywny w scenie – użyty jako cel.")]
-    public Transform birdTarget;
-
-    [Tooltip("Prefab ptaka. Jeśli nie ma istniejącego celu – można go zespawnować.")]
-    public GameObject birdPrefab;
-
-    [Tooltip("Tag istniejących ptaków w scenie do wyszukania (np. 'Bird').")]
-    public string birdTag = "Bird";
-
-    [Tooltip("Opcjonalny spawner, który potrafi spawnować ptaki w losowych miejscach.")]
-    public RandomSpawner2D birdSpawner;
-
-    [Tooltip("Jeśli brak celu – najpierw spróbuj znaleźć najbliższy z tagiem 'birdTag'.")]
-    public bool preferNearestTaggedBird = true;
-
-    [Tooltip("Jeśli nadal brak celu – zespawnuj nowego ptaka.")]
-    public bool spawnIfNoBirdFound = true;
+    [Header("Cele (ptaki) – tylko istniejące")]
+    public Transform birdTarget;                  // opcjonalny istniejący cel
+    public string birdTag = "Bird";               // WSZYSTKIE ptaki muszą mieć ten tag
+    public bool preferNearestTaggedBird = true;   // gdy jest wiele
 
     [Header("Ruch do celu")]
     public float moveSpeed = 3f;
     public float stopDistance = 0.2f;
-    public float effectDuration = 3f; // maks czas trwania efektu (opcjonalny)
+    public float effectDuration = 3f;
 
     [Header("Mash (ucieczka)")]
     [Min(0f)] public float mashPerPress = 0.2f;
@@ -71,6 +52,14 @@ public class ZoneEffectSimple : MonoBehaviour
     public bool bannerUseUnscaledTime = true;
     public CanvasGroup bannerCanvasGroup;
 
+    [Header("Po mashu: usuń wszystkie ptaki i poproś o respawn (event)")]
+    public bool destroyAllBirdsOnMashInterrupt = true;
+    [Min(0f)] public float birdRespawnDelay = 5f;
+
+    [Tooltip("Zostanie wywołane po birdRespawnDelay od udanego mashu. " +
+             "Podepnij tutaj np. RandomSpawner2D.SpawnObjects() albo własny manager.")]
+    public UnityEvent OnRespawnRequested;
+
     [Header("Debug")]
     public bool debugLogs = true;
 
@@ -78,16 +67,16 @@ public class ZoneEffectSimple : MonoBehaviour
     private bool playerInside = false;
     private bool isEffectActive = false;
 
-    private Coroutine rollRoutine;   // pętla losowań (pauzowana na czas efektu)
+    private Coroutine rollRoutine;
     private Coroutine moveRoutine;
     private Coroutine bannerPulseRoutine;
     private Coroutine bannerSlideRoutine;
 
     private GameObject cachedPlayer;
-    private Behaviour disabledScript;  // rzeczywiście wyłączony komponent
+    private Behaviour disabledScript;
 
-    // Pasek ucieczki [0..1]
     private float mashValue = 0f;
+    private bool interruptedByMash = false;
 
     private void Start()
     {
@@ -110,7 +99,7 @@ public class ZoneEffectSimple : MonoBehaviour
         cachedPlayer = other.gameObject;
         if (playerTransform == null) playerTransform = cachedPlayer.transform;
 
-        StartRollLoopFresh(); // start losowania po wejściu (pełny reset timera)
+        StartRollLoopFresh();
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -121,10 +110,10 @@ public class ZoneEffectSimple : MonoBehaviour
         StopRollLoop();
 
         if (moveRoutine != null) { StopCoroutine(moveRoutine); moveRoutine = null; }
-        if (isEffectActive) RestoreAfterEffect(); // elegancko zakończ efekt, jeśli trwał
+        if (isEffectActive) RestoreAfterEffect();
     }
 
-    // --------- LOSOWANIE EFEKTU ---------
+    // --------- LOSOWANIE ---------
 
     private void StartRollLoopFresh()
     {
@@ -155,9 +144,9 @@ public class ZoneEffectSimple : MonoBehaviour
 
             if (Random.value <= (chancePercent / 100f))
             {
-                StopRollLoop();       // pauza losowań na czas efektu
+                StopRollLoop();
                 ApplyEffect(cachedPlayer);
-                yield break;          // wznowimy po RestoreAfterEffect()
+                yield break;
             }
         }
 
@@ -170,77 +159,46 @@ public class ZoneEffectSimple : MonoBehaviour
     {
         if (isEffectActive) return;
 
-        // Ustal cel (istniejący / najbliższy po tagu / spawn)
         if (!ResolveBirdTarget(player))
         {
-            if (debugLogs) Debug.LogWarning("[Zone] Nie udało się ustalić celu (bird). Efekt anulowany.");
+            if (debugLogs) Debug.LogWarning("[Zone] Brak dostępnego celu (bird) w scenie. Efekt pominięty.");
             StartRollLoopFresh();
             return;
         }
 
-        if (debugLogs) Debug.Log($"[Zone] Trafienie! Cel: {birdTarget?.name ?? "null"} (mash {mashKey} by uciec)");
+        if (debugLogs) Debug.Log($"[Zone] Trafienie! Cel: {birdTarget?.name ?? "null"} (mash {mashKey})");
 
-        // Reset mash
         mashValue = 0f;
+        interruptedByMash = false;
         isEffectActive = true;
         PushMashToUI();
 
-        // Wyłącz sterowanie na graczu (po referencji/typie)
         disabledScript = DisableTargetComponentOnPlayer(player);
 
-        // UI baner – pokaż + pulsuj
         ShowEffectBanner();
 
-        // Ruch
         if (moveRoutine == null)
             moveRoutine = StartCoroutine(MovePlayerToBirdWithMash(player));
     }
 
-    /// <summary>
-    /// Ustala cel (birdTarget) wg priorytetu:
-    /// 1) przypięty Transform (aktywny),
-    /// 2) najbliższy obiekt z tagiem,
-    /// 3) spawn przez spawner,
-    /// 4) lokalny spawn z prefabu.
-    /// </summary>
     private bool ResolveBirdTarget(GameObject player)
     {
-        // 1) Jeżeli już jest (i aktywny) – używamy
+        // 1) Przypięty i aktywny
         if (birdTarget != null && birdTarget.gameObject.activeInHierarchy)
             return true;
 
-        // 2) Szukaj najbliższego z tagiem
+        // 2) Najbliższy po tagu
         if (preferNearestTaggedBird && !string.IsNullOrWhiteSpace(birdTag))
         {
             var nearest = FindNearestByTag(birdTag, player.transform.position);
-            if (nearest != null) { birdTarget = nearest.transform; return true; }
+            if (nearest != null)
+            {
+                birdTarget = nearest.transform;
+                return true;
+            }
         }
 
-        // 3) Użyj spawnera (jeśli jest)
-        if (spawnIfNoBirdFound && birdSpawner != null)
-        {
-            // jeśli spawner nie ma prefabu, a my mamy — podepnij
-            if (birdSpawner.prefabToSpawn == null && birdPrefab != null)
-                birdSpawner.prefabToSpawn = birdPrefab;
-
-            var spawned = birdSpawner.SpawnOne(); // wymaga Twojej metody SpawnOne()
-            if (spawned != null) { birdTarget = spawned.transform; return true; }
-        }
-
-        // 4) Lokalny spawn z prefabu
-        if (spawnIfNoBirdFound && birdPrefab != null)
-        {
-            Vector2 pos = player.transform.position;
-            if (birdSpawner != null && birdSpawner.spawnArea != null)
-                pos = GetRandomPointInArea(birdSpawner.spawnArea);
-
-            var go = Instantiate(birdPrefab, pos, Quaternion.identity);
-            if (!string.IsNullOrWhiteSpace(birdTag)) go.tag = birdTag; // opcjonalnie nadaj tag
-            birdTarget = go.transform;
-            return true;
-        }
-
-        // Nie udało się
+        // 3) Brak spawnowania tutaj – jeśli nie znaleziono, anuluj efekt
         return false;
     }
 
@@ -263,51 +221,33 @@ public class ZoneEffectSimple : MonoBehaviour
         return best;
     }
 
-    private static Vector2 GetRandomPointInArea(BoxCollider2D area)
-    {
-        Vector2 c = area.bounds.center;
-        Vector2 s = area.bounds.size;
-        float x = Random.Range(c.x - s.x * 0.5f, c.x + s.x * 0.5f);
-        float y = Random.Range(c.y - s.y * 0.5f, c.y + s.y * 0.5f);
-        return new Vector2(x, y);
-    }
-
-    // --------- Wyłączanie/przywracanie komponentu sterowania ---------
+    // --------- Wyłączanie/przywracanie komponentu ---------
 
     private Behaviour DisableTargetComponentOnPlayer(GameObject player)
     {
-        // 1) Dokładnie ten komponent (przeciągnięty w Inspektorze)
         if (disableThisExactComponent != null)
         {
             disableThisExactComponent.enabled = false;
-            if (debugLogs) Debug.Log($"[Zone] Wyłączono dokładny komponent: {disableThisExactComponent.GetType().Name}");
+            if (debugLogs) Debug.Log($"[Zone] Wyłączono: {disableThisExactComponent.GetType().Name}");
             return disableThisExactComponent;
         }
 
-        // 2) Po typie z referencji (np. z prefabu)
         if (componentTypeReference != null)
         {
             var targetType = componentTypeReference.GetType();
-            Behaviour found = null;
-
-            if (searchInChildren)
-                found = player.GetComponentInChildren(targetType, includeInactive: true) as Behaviour;
-            else
-                found = player.GetComponent(targetType) as Behaviour;
+            Behaviour found = searchInChildren
+                ? player.GetComponentInChildren(targetType, true) as Behaviour
+                : player.GetComponent(targetType) as Behaviour;
 
             if (found != null)
             {
                 found.enabled = false;
-                if (debugLogs) Debug.Log($"[Zone] Wyłączono komponent typu: {targetType.Name} na graczu.");
+                if (debugLogs) Debug.Log($"[Zone] Wyłączono typ: {targetType.Name}");
                 return found;
             }
-            else
-            {
-                if (debugLogs) Debug.LogWarning($"[Zone] Nie znaleziono na graczu komponentu typu {targetType.Name}.");
-            }
+            else if (debugLogs) Debug.LogWarning($"[Zone] Nie znaleziono komponentu typu {targetType.Name}");
         }
 
-        if (debugLogs) Debug.LogWarning("[Zone] Nie wskazano komponentu do wyłączenia (ani exact, ani type reference).");
         return null;
     }
 
@@ -315,7 +255,7 @@ public class ZoneEffectSimple : MonoBehaviour
     {
         if (b == null) return;
         b.enabled = true;
-        if (debugLogs) Debug.Log($"[Zone] Przywrócono komponent: {b.GetType().Name}");
+        if (debugLogs) Debug.Log($"[Zone] Przywrócono: {b.GetType().Name}");
     }
 
     // --------- Ruch + Mash ---------
@@ -330,12 +270,12 @@ public class ZoneEffectSimple : MonoBehaviour
 
         while (player != null && isEffectActive)
         {
-            // --- Mash ---
+            // Mash
             if (Input.GetKeyDown(mashKey))
             {
                 mashValue = Mathf.Min(1f, mashValue + mashPerPress);
                 PushMashToUI();
-                if (debugLogs) Debug.Log($"[Zone] Mash {mashKey}! value={mashValue:0.00}");
+                if (debugLogs) Debug.Log($"[Zone] Mash {mashKey}: {mashValue:0.00}");
             }
 
             if (mashDecayPerSecond > 0f)
@@ -348,11 +288,12 @@ public class ZoneEffectSimple : MonoBehaviour
 
             if (mashValue >= 0.99f)
             {
-                if (debugLogs) Debug.Log("[Zone] Ucieczka! Efekt przerwany przez mash.");
+                interruptedByMash = true;
+                if (debugLogs) Debug.Log("[Zone] Ucieczka: efekt przerwany mashowaniem.");
                 break;
             }
 
-            // --- Ramp-up prędkości + miękki obrót ---
+            // Ease-in prędkości
             float speedMul = 1f;
             if (smoothTakeover && takeoverEaseIn > 0f)
             {
@@ -360,7 +301,7 @@ public class ZoneEffectSimple : MonoBehaviour
                 speedMul = Mathf.Clamp01(takeoverCurve.Evaluate(takeoverT));
             }
 
-            // --- Ruch/obrót do celu ---
+            // Ruch/obrót do celu
             if (birdTarget != null)
             {
                 Vector2 from = player.transform.position;
@@ -368,7 +309,7 @@ public class ZoneEffectSimple : MonoBehaviour
                 Vector2 dir = to - from;
 
                 if (!birdTarget.gameObject.activeInHierarchy)
-                    break; // cel zniknął
+                    break;
 
                 if (playerTransform != null && rotateLerpSpeed > 0f && dir.sqrMagnitude > 0.0001f)
                 {
@@ -380,26 +321,30 @@ public class ZoneEffectSimple : MonoBehaviour
 
                 if (dir.sqrMagnitude <= (stopDistance * stopDistance))
                 {
-                    if (debugLogs) Debug.Log("[Zone] Dotarto do 'bird'.");
-                    break;
+                    if (debugLogs) Debug.Log("[Zone] Dotarto do celu (ptak zostaje).");
+                    break; // nie niszczymy ptaka
                 }
 
                 float currentSpeed = moveSpeed * speedMul;
                 Vector2 step = dir.normalized * currentSpeed * Time.deltaTime;
 
-                if (rb != null)
-                    rb.MovePosition(rb.position + step);
-                else
-                    player.transform.position = (Vector2)player.transform.position + step;
+                if (rb != null) rb.MovePosition(rb.position + step);
+                else player.transform.position = (Vector2)player.transform.position + step;
             }
 
-            // --- Limit czasu (opcjonalny) ---
+            // Limit czasu
             elapsed += Time.deltaTime;
             if (effectDuration > 0f && elapsed >= effectDuration)
             {
-                if (debugLogs) Debug.Log("[Zone] Minął maksymalny czas efektu. Przywracam kontrolę.");
+                if (debugLogs) Debug.Log("[Zone] Minął maksymalny czas efektu.");
+
+                var birds = GameObject.FindGameObjectsWithTag(birdTag);
+                for (int i = 0; i < birds.Length; i++)
+                    if (birds[i] != null) Destroy(birds[i]);
                 break;
+
             }
+
 
             yield return null;
         }
@@ -410,7 +355,6 @@ public class ZoneEffectSimple : MonoBehaviour
 
     private void RestoreAfterEffect()
     {
-        // Przywróć sterowanie
         RestoreDisabledComponent(disabledScript);
         disabledScript = null;
 
@@ -420,12 +364,49 @@ public class ZoneEffectSimple : MonoBehaviour
 
         HideEffectBanner();
 
-        // Reset losowania po efekcie (pełny interval)
         if (playerInside && cachedPlayer != null)
             StartRollLoopFresh();
+
+        if (interruptedByMash && destroyAllBirdsOnMashInterrupt)
+        {
+            StartCoroutine(DestroyAllBirdsThenRequestRespawn());
+        }
+        interruptedByMash = false;
     }
 
-    // ---------- UI: Mash Helpers ----------
+    private IEnumerator DestroyAllBirdsThenRequestRespawn()
+    {
+        // 1) Usuń wszystkie ptaki po tagu
+        if (string.IsNullOrWhiteSpace(birdTag))
+        {
+            Debug.LogWarning("[Zone] birdTag jest pusty – nie mogę usunąć wszystkich ptaków. Ustaw tag w Inspectorze.");
+        }
+        else
+        {
+            var birds = GameObject.FindGameObjectsWithTag(birdTag);
+            for (int i = 0; i < birds.Length; i++)
+                if (birds[i] != null) Destroy(birds[i]);
+
+            if (debugLogs) Debug.Log($"[Zone] Usunięto {birds.Length} ptaków (tag: {birdTag}).");
+        }
+
+        // 2) Czekaj X sekund
+        if (birdRespawnDelay > 0f)
+            yield return new WaitForSeconds(birdRespawnDelay);
+
+        // 3) NIE spawnować tutaj. Zamiast tego — zgłoś prośbę o respawn.
+        if (OnRespawnRequested != null)
+        {
+            if (debugLogs) Debug.Log("[Zone] OnRespawnRequested → uruchom swój spawner przez UnityEvent.");
+            OnRespawnRequested.Invoke();
+        }
+        else if (debugLogs)
+        {
+            Debug.LogWarning("[Zone] OnRespawnRequested niepodpięty – nic nie zostanie zrespawnowane.");
+        }
+    }
+
+    // ---------- UI helpers ----------
     private void ConfigureSliders()
     {
         if (mashSliders == null) return;
@@ -449,11 +430,10 @@ public class ZoneEffectSimple : MonoBehaviour
                 s.value = mashValue;
             }
         }
-
         OnMashValueChanged?.Invoke(mashValue);
     }
 
-    // ---------- UI: Banner Anim ----------
+    // ---------- Banner ----------
     private void ShowEffectBanner()
     {
         if (effectBanner == null) return;

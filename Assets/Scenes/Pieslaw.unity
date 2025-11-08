@@ -646,181 +646,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &389026943
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 389026946}
-  - component: {fileID: 389026945}
-  - component: {fileID: 389026944}
-  m_Layer: 0
-  m_Name: EffectArea (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!61 &389026944
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 389026943}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 20, y: 20}
-  m_EdgeRadius: 0
---- !u!114 &389026945
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 389026943}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b161303d3fcfec64e81f6f505514b7a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerTag: Player
-  playerTransform: {fileID: 2006364504}
-  chancePercent: 81
-  interval: 5
-  disableThisExactComponent: {fileID: 0}
-  componentTypeReference: {fileID: 0}
-  searchInChildren: 1
-  birdTarget: {fileID: 1951154119}
-  birdPrefab: {fileID: 0}
-  birdTag: Bird
-  birdSpawner: {fileID: 0}
-  preferNearestTaggedBird: 1
-  spawnIfNoBirdFound: 1
-  moveSpeed: 5
-  stopDistance: 0.2
-  effectDuration: 10
-  mashPerPress: 0.2
-  mashDecayPerSecond: 0.25
-  mashKey: 101
-  mashSliders:
-  - {fileID: 423752605}
-  OnMashValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  smoothTakeover: 1
-  takeoverEaseIn: 0.35
-  takeoverCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  rotateLerpSpeed: 12
-  effectBanner: {fileID: 1337734692}
-  bannerHiddenPos: {x: -1000, y: 0}
-  bannerShownPos: {x: 10, y: 0}
-  bannerSlideDuration: 0.25
-  bannerSlideCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  bannerPulseAmplitude: 0.06
-  bannerPulseFrequency: 3
-  bannerUseUnscaledTime: 1
-  bannerCanvasGroup: {fileID: 0}
-  debugLogs: 1
---- !u!4 &389026946
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 389026943}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 23.7, y: 4.2, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &423752604
 GameObject:
   m_ObjectHideFlags: 0
@@ -1921,11 +1746,8 @@ MonoBehaviour:
   componentTypeReference: {fileID: 2006364502}
   searchInChildren: 1
   birdTarget: {fileID: 357769752}
-  birdPrefab: {fileID: 3073188288422497666, guid: f117daa678dfb2a4f87ee6978e45ad80, type: 3}
   birdTag: Bird
-  birdSpawner: {fileID: 0}
   preferNearestTaggedBird: 1
-  spawnIfNoBirdFound: 1
   moveSpeed: 5
   stopDistance: 0.2
   effectDuration: 10
@@ -1996,6 +1818,23 @@ MonoBehaviour:
   bannerPulseFrequency: 3
   bannerUseUnscaledTime: 1
   bannerCanvasGroup: {fileID: 0}
+  destroyAllBirdsOnMashInterrupt: 1
+  birdRespawnDelay: 5
+  OnRespawnRequested:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1252881221}
+        m_TargetAssemblyTypeName: RandomSpawner2D, Assembly-CSharp
+        m_MethodName: SpawnObjectsCount
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   debugLogs: 1
 --- !u!4 &1252881220
 Transform:
@@ -2025,10 +1864,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnArea: {fileID: 1252881218}
+  requiredTag: 
   prefabToSpawn: {fileID: 3073188288422497666, guid: f117daa678dfb2a4f87ee6978e45ad80, type: 3}
-  spawnCount: 1
-  spawnOnStart: 1
-  repeatInterval: 0
+  spawnCountOnEnter: 1
+  parentSpawnedToThis: 1
+  spawnOnTriggerEnter: 1
   lastSpawned: {fileID: 0}
 --- !u!1 &1259301484
 GameObject:
@@ -2117,81 +1957,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &1337734691
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1337734692}
-  - component: {fileID: 1337734694}
-  - component: {fileID: 1337734693}
-  m_Layer: 5
-  m_Name: ptoszek (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1337734692
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1337734691}
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.7500001, y: 1.7500001, z: 1.7500001}
-  m_ConstrainProportionsScale: 1
-  m_Children: []
-  m_Father: {fileID: 1905591982}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: -191, y: 0}
-  m_SizeDelta: {x: 200, y: 200}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1337734693
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1337734691}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 56460315780584c4d86e5227edc7c60e, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 1
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &1337734694
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1337734691}
-  m_CullTransparentMesh: 1
 --- !u!1 &1392385683
 GameObject:
   m_ObjectHideFlags: 0
@@ -2958,7 +2723,6 @@ RectTransform:
   - {fileID: 423752606}
   - {fileID: 1708347107}
   - {fileID: 584996260}
-  - {fileID: 1337734692}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3565,6 +3329,5 @@ SceneRoots:
   - {fileID: 1905591982}
   - {fileID: 149593141}
   - {fileID: 1252881220}
-  - {fileID: 389026946}
   - {fileID: 2537416611674706549}
   - {fileID: 1951154119}
