@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using TMPro; // dla MatchTextPreferred
 
 public class ZoneEffectSimple : MonoBehaviour
 {
@@ -13,7 +14,6 @@ public class ZoneEffectSimple : MonoBehaviour
 
     [Header("Stop na celu")]
     [Min(0f)] public float holdAtTargetSeconds = 2f;
-
 
     [Header("Sterowanie do wyłączenia (opcjonalne)")]
     public DogMovement disableThisExactComponent;   // wyłączy dokładnie ten komponent
@@ -56,6 +56,29 @@ public class ZoneEffectSimple : MonoBehaviour
     public bool bannerUseUnscaledTime = true;
     public CanvasGroup bannerCanvasGroup;
 
+    // ===== INTUICYJNY ROZMIAR BANERU =====
+    public enum BannerSizeMode { FixedPixels, PercentOfParent, MatchTextPreferred }
+
+    [Header("UI – Banner Size (intuicyjnie)")]
+    public BannerSizeMode sizeMode = BannerSizeMode.FixedPixels;
+
+    [Tooltip("Stały rozmiar w pikselach (gdy FixedPixels)")]
+    public Vector2 fixedSize = new Vector2(600f, 120f);
+
+    [Tooltip("Udział rozmiaru rodzica (0–1) (gdy PercentOfParent)")]
+    [Range(0f, 1f)] public float widthPercent = 1.0f;      // np. pełna szerokość
+    [Range(0f, 1f)] public float heightPercent = 0.1667f;  // np. 1/6 wysokości ekranu
+
+    [Tooltip("Padding dodawany do wyliczonego rozmiaru (px)")]
+    public Vector2 sizePadding = Vector2.zero;
+
+    [Tooltip("Zachowaj proporcje W:H")]
+    public bool keepAspect = false;
+
+    [Tooltip("Proporcje (W/H), np. 4:1 → 4.0")]
+    public float aspect = 4.0f;
+    // =====================================
+
     [Header("Po mashu: usuń wszystkie ptaki i poproś o respawn (event)")]
     public bool destroyAllBirdsOnMashInterrupt = true;
     [Min(0f)] public float birdRespawnDelay = 5f;
@@ -89,6 +112,9 @@ public class ZoneEffectSimple : MonoBehaviour
 
         if (effectBanner != null)
         {
+            // Ustal rozmiar już na starcie, zanim pokażemy baner
+            ApplyBannerSize();
+
             effectBanner.anchoredPosition = bannerHiddenPos;
             if (bannerCanvasGroup != null) bannerCanvasGroup.alpha = 0f;
             effectBanner.localScale = Vector3.one;
@@ -118,7 +144,6 @@ public class ZoneEffectSimple : MonoBehaviour
     }
 
     // --------- LOSOWANIE ---------
-
     private void StartRollLoopFresh()
     {
         StopRollLoop();
@@ -158,7 +183,6 @@ public class ZoneEffectSimple : MonoBehaviour
     }
 
     // --------- EFEKT ---------
-
     private void ApplyEffect(GameObject player)
     {
         if (isEffectActive) return;
@@ -226,7 +250,6 @@ public class ZoneEffectSimple : MonoBehaviour
     }
 
     // --------- Wyłączanie/przywracanie komponentu ---------
-
     private Behaviour DisableTargetComponentOnPlayer(GameObject player)
     {
         if (disableThisExactComponent != null)
@@ -263,7 +286,6 @@ public class ZoneEffectSimple : MonoBehaviour
     }
 
     // --------- Ruch + Mash ---------
-
     private IEnumerator MovePlayerToBirdWithMash(GameObject player)
     {
         float elapsed = 0f;
@@ -331,7 +353,6 @@ public class ZoneEffectSimple : MonoBehaviour
                     if (holdAtTargetSeconds > 0f)
                         yield return new WaitForSeconds(holdAtTargetSeconds);
 
-
                     var birds = GameObject.FindGameObjectsWithTag(birdTag);
                     for (int i = 0; i < birds.Length; i++)
                         if (birds[i] != null) Destroy(birds[i]);
@@ -355,9 +376,7 @@ public class ZoneEffectSimple : MonoBehaviour
                 for (int i = 0; i < birds.Length; i++)
                     if (birds[i] != null) Destroy(birds[i]);
                 break;
-
             }
-
 
             yield return null;
         }
@@ -451,6 +470,9 @@ public class ZoneEffectSimple : MonoBehaviour
     {
         if (effectBanner == null) return;
 
+        // >>> Rozmiar przed animacją
+        ApplyBannerSize();
+
         if (bannerSlideRoutine != null) StopCoroutine(bannerSlideRoutine);
         if (bannerPulseRoutine != null) StopCoroutine(bannerPulseRoutine);
 
@@ -514,5 +536,67 @@ public class ZoneEffectSimple : MonoBehaviour
 
         tr.localScale = Vector3.one;
         bannerPulseRoutine = null;
+    }
+
+    // ---------- Intuicyjny rozmiar baneru ----------
+    private void ApplyBannerSize()
+    {
+        if (effectBanner == null) return;
+
+        float w = fixedSize.x;
+        float h = fixedSize.y;
+
+        switch (sizeMode)
+        {
+            case BannerSizeMode.FixedPixels:
+                w = Mathf.Max(0f, fixedSize.x);
+                h = Mathf.Max(0f, fixedSize.y);
+                break;
+
+            case BannerSizeMode.PercentOfParent:
+                {
+                    var parent = effectBanner.parent as RectTransform;
+                    if (parent != null)
+                    {
+                        w = Mathf.Max(0f, parent.rect.width * widthPercent);
+                        h = Mathf.Max(0f, parent.rect.height * heightPercent);
+                    }
+                    w += sizePadding.x;
+                    h += sizePadding.y;
+                }
+                break;
+
+            case BannerSizeMode.MatchTextPreferred:
+                {
+                    Vector2 pref = new Vector2(400f, 80f); // fallback
+
+                    var tmp = effectBanner.GetComponentInChildren<TextMeshProUGUI>(true);
+                    if (tmp != null)
+                    {
+                        var p = tmp.GetPreferredValues(tmp.text, 10000f, 10000f);
+                        pref = p;
+                    }
+                    else
+                    {
+                        var uiText = effectBanner.GetComponentInChildren<Text>(true);
+                        if (uiText != null)
+                        {
+                            var le = uiText.GetComponent<LayoutElement>();
+                            if (le != null && (le.preferredWidth > 0 || le.preferredHeight > 0))
+                                pref = new Vector2(le.preferredWidth, le.preferredHeight);
+                        }
+                    }
+
+                    w = Mathf.Max(0f, pref.x + sizePadding.x);
+                    h = Mathf.Max(0f, pref.y + sizePadding.y);
+                }
+                break;
+        }
+
+        if (keepAspect && aspect > 0.0001f)
+            h = w / aspect; // dopasuj wysokość do szerokości wg aspect
+
+        effectBanner.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, w);
+        effectBanner.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, h);
     }
 }

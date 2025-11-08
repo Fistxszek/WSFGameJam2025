@@ -99,27 +99,27 @@ public class DogMovement : MonoBehaviour
         }
     }
 
-    // private void OnTriggerEnter2D(Collider2D other)
-    // {
-    //     if (other.CompareTag("jezioro"))
-    //     {
-    //         _animator.SetBool("isSwimming", true);
-    //         _currentSpeedMulti = 0.5f;
-    //         Debug.Log("p�ywanie");
-    //     }
-    //
-    // }
-    //
-    // private void OnTriggerExit2D(Collider2D other)
-    // {
-    //     if (other.CompareTag("jezioro"))
-    //     {
-    //         _animator.SetBool("isSwimming", false);
-    //         _currentSpeedMulti = 1;
-    //         Debug.Log("NIEp�ywanie");
-    //     }
-    //
-    // }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Jezioro"))
+        {
+            _animator.SetBool("isSwimming", true);
+            _currentSpeedMulti = 0.5f;
+            Debug.Log("plywanie");
+        }
+
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Jezioro"))
+        {
+            _animator.SetBool("isSwimming", false);
+            _currentSpeedMulti = 1;
+            Debug.Log("NIEplywanie");
+        }
+
+    }
 
     private bool _leftActive;
     private bool _rightActive;
