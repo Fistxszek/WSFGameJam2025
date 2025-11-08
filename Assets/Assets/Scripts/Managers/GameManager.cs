@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -24,5 +25,20 @@ public class GameManager : MonoBehaviour
     private void OnDisable()
     {
         controls?.Disable();
+    }
+
+    private void Start()
+    {
+       TimerManager.Instance.StartTimer(); 
+    }
+
+    public void OnPlayAgainBtn()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
+    }
+
+    public void OnMainMenuBtn()
+    {
+        SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 }
