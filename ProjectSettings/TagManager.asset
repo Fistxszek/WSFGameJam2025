@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Sheep
   - Bird
+  - Jezioro
   layers:
   - Default
   - TransparentFX
