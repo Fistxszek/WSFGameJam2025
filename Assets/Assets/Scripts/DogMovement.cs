@@ -16,8 +16,10 @@ public class DogMovement : MonoBehaviour
     private float rotationDirection = 0f; // -1 for left, 1 for right, 0 for no rotation
     [Header("Sprint settings")]
     private float _currentSpeedMulti = 1;
-    [SerializeField] private float _speedMulti;
+    [SerializeField] private float _slowWalkSpeed;
     [SerializeField] private float _sprintLength;
+
+    [SerializeField] private Transform Gate;
 
     private void Awake()
     {
@@ -44,7 +46,12 @@ public class DogMovement : MonoBehaviour
         input.Movement.Right.canceled += OnRotateRight;
         
         input.Movement.StartStop.performed += OnToggleMovement;
-        input.Movement.Sprint.performed += OnSprintEnabled;
+        
+        input.Movement.Sprint.started += OnSprintEnabled;
+        input.Movement.Sprint.canceled += OnSprintEnabled;
+
+        input.Movement.SlowWalk.started += OnSlowWalkEnabled;
+        input.Movement.SlowWalk.canceled += OnSlowWalkEnabled;
     }
     private void OnDisable()
     {
@@ -58,7 +65,12 @@ public class DogMovement : MonoBehaviour
         input.Movement.Right.canceled -= OnRotateRight;
         
         input.Movement.StartStop.performed -= OnToggleMovement;
-        input.Movement.Sprint.performed -= OnSprintEnabled;
+        
+        input.Movement.Sprint.started -= OnSprintEnabled;
+        input.Movement.Sprint.canceled -= OnSprintEnabled;
+        
+        input.Movement.SlowWalk.started -= OnSlowWalkEnabled;
+        input.Movement.SlowWalk.canceled -= OnSlowWalkEnabled;
     }
 
     private void FixedUpdate()
@@ -92,6 +104,7 @@ public class DogMovement : MonoBehaviour
         if (context.started)
         {
             rotationDirection = 1f; // Positive rotation (counterclockwise)
+            ShowRightMessageAndExpression.Instance.ChangeMessageSprite(MsgType.Left);
         }
         else if (context.canceled)
         {
@@ -108,6 +121,7 @@ public class DogMovement : MonoBehaviour
         if (context.started)
         {
             rotationDirection = -1f; // Negative rotation (clockwise)
+            ShowRightMessageAndExpression.Instance.ChangeMessageSprite(MsgType.Right);
         }
         else if (context.canceled)
         {
@@ -121,19 +135,61 @@ public class DogMovement : MonoBehaviour
         if (context.performed)
         {
             isMoving = !isMoving;
+            rotationDirection = 0;
+            
+            if (!isMoving)
+                ShowRightMessageAndExpression.Instance.ChangeMessageSprite(MsgType.Stay);
+            else
+                ShowRightMessageAndExpression.Instance.ChangeMessageSprite(MsgType.Go);
         }
     }
+    
+    void FaceTarget()
+    {
+        // Calculate direction to target
+        Vector2 direction = Gate.position - transform.position;
+    
+        // Calculate angle in degrees
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+    
+        // Apply rotation (subtract 90 if your sprite faces up by default)
+        transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
+    }
+
+    private float baseRotSpeed;
 
     public void OnSprintEnabled(InputAction.CallbackContext context)
     {
-        if (context.performed)
-            StartCoroutine(WaitForSprintReset());
+        if (context.started)
+        {
+            baseRotSpeed = rotationSpeed;
+            rotationSpeed *= 4;
+            ShowRightMessageAndExpression.Instance.ChangeMessageSprite(MsgType.Push);
+        }
+        else if (context.canceled)
+        {
+            rotationSpeed = baseRotSpeed;
+        }
+    }
+    public void OnSlowWalkEnabled(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            _currentSpeedMulti = _slowWalkSpeed; 
+        }
+        else if (context.canceled)
+        {
+            _currentSpeedMulti = 1;
+        }
     }
 
     private IEnumerator WaitForSprintReset()
     {
-        _currentSpeedMulti = _speedMulti;
+        var baseRotSpeed = rotationSpeed;
+        rotationSpeed *= 4;
+        // _currentSpeedMulti = _speedMulti;
         yield return new WaitForSeconds(_sprintLength);
-        _currentSpeedMulti = 1;
+        // _currentSpeedMulti = 1;
+        rotationSpeed = baseRotSpeed;
     }
 }
