@@ -14,8 +14,9 @@ GameObject:
   - component: {fileID: 5733479673175277047}
   - component: {fileID: 5649622447709779691}
   - component: {fileID: 3496376180364469205}
+  - component: {fileID: 4514215610973194806}
   m_Layer: 6
-  m_Name: owca
+  m_Name: owcaM
   m_TagString: Sheep
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 9.74, y: 10.19, z: 0}
-  m_LocalScale: {x: 1.31, y: 1.31, z: 1.31}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -80,7 +81,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: -3609207279662956678, guid: 0cf262d562beb704cb469bff01871344, type: 3}
+  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -161,8 +162,8 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.01, y: -0.03}
-  m_Radius: 0.29
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 0.55
 --- !u!50 &5649622447709779691
 Rigidbody2D:
   serializedVersion: 5
@@ -207,7 +208,7 @@ MonoBehaviour:
   gateTarget: {fileID: 0}
   triggerCollider: {fileID: 6877329075009094211}
   minFleeSpeed: 0.2
-  maxFleeSpeed: 4
+  maxFleeSpeed: 1.5
   panicSpeedDistance: 3
   calmSpeedDistance: 12
   smoothStop: 1
@@ -224,16 +225,16 @@ MonoBehaviour:
   maxDogDistance: 10
   closeSteeringSpeed: 180
   farSteeringSpeed: 45
-  gateAttractionStartDistance: 82.4
-  gateAttractionForceDistance: 81.3
-  gateCaptureRadius: 2.16
+  gateAttractionStartDistance: 40
+  gateAttractionForceDistance: 30
+  gateCaptureRadius: 3.41
   maxGateInfluence: 0.598
   groupFollowCheckRadius: 30
   groupFollowMagnetismBoost: 0.588
   leaderFollowRadius: 20
   leaderStickiness: 7
   disperseDistance: 12
-  leaderFollowWeight: 0.6
+  leaderFollowWeight: 0.935
   chillMoveSpeed: 2
   chillUpdateInterval: 0.5
   alertRange: 3
@@ -246,3 +247,25 @@ MonoBehaviour:
   normalAnimationSpeed: 5
   debugLogs: 0
   showSpeedDebug: 0
+--- !u!95 &4514215610973194806
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3953676745067263445}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8b4f42c16e4a3eb48b230fe0e934d0da, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
