@@ -67,6 +67,18 @@ public class FlockingSheep : MonoBehaviour
     public float alertRange = 3f;
     public float alertCooldown = 1f;
     
+    [Header("Visual Rotation")]
+    public float rotationSpeed = 360f;
+    [Tooltip("Offset if your sprite doesn't face up by default (e.g., 90 if facing right)")]
+    public float spriteDirectionOffset = 0f;
+    
+    [Header("Animation")]
+    public Animator animator;
+    public string speedParameterName = "Speed";
+    public string isMovingParameterName = "IsMoving";
+    [Tooltip("Speed at which animation plays at 1x speed")]
+    public float normalAnimationSpeed = 5f;
+    
     [Header("Debug")]
     public bool debugLogs = false;
     public bool showSpeedDebug = false;
@@ -89,6 +101,14 @@ public class FlockingSheep : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        
+        // Auto-assign Animator if not set
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
+            if (animator == null)
+                animator = GetComponentInChildren<Animator>();
+        }
         
         if (triggerCollider == null)
         {
@@ -163,6 +183,9 @@ public class FlockingSheep : MonoBehaviour
             rb.bodyType = RigidbodyType2D.Kinematic;
         }
         
+        currentSpeed = 0f;
+        UpdateAnimator();
+        
         if (debugLogs)
             Debug.Log($"{name} captured at gate!", this);
     }
@@ -222,13 +245,22 @@ public class FlockingSheep : MonoBehaviour
                     currentDirection = awayFromDog;
                 }
 
+                currentSpeed = chillMoveSpeed;
+                
                 if (rb != null)
-                    rb.linearVelocity = currentDirection * chillMoveSpeed;
+                    rb.linearVelocity = currentDirection * currentSpeed;
+                
+                UpdateVisualRotation();
+                UpdateAnimator();
             }
             else
             {
+                currentSpeed = 0f;
+                
                 if (rb != null)
                     rb.linearVelocity = Vector2.zero;
+                
+                UpdateAnimator();
             }
 
             yield return new WaitForSeconds(chillUpdateInterval);
@@ -373,6 +405,9 @@ public class FlockingSheep : MonoBehaviour
             else if (!CapturedByGate)
                 transform.position += (Vector3)(currentDirection * currentSpeed * Time.deltaTime);
             
+            UpdateVisualRotation();
+            UpdateAnimator();
+            
             yield return null;
         }
 
@@ -395,7 +430,45 @@ public class FlockingSheep : MonoBehaviour
 
             movementRoutine = null;
             Alerted = false;
+            currentSpeed = 0f;
+            UpdateAnimator();
         }
+    }
+
+    private void UpdateVisualRotation()
+    {
+        if (currentDirection.sqrMagnitude < 0.01f) return; // Don't rotate if not moving
+        
+        // Calculate target angle from movement direction
+        float targetAngle = Mathf.Atan2(currentDirection.y, currentDirection.x) * Mathf.Rad2Deg;
+        targetAngle -= 90f + spriteDirectionOffset; // Adjust for sprite facing up by default
+        
+        // Create target rotation
+        Quaternion targetRotation = Quaternion.Euler(0f, 0f, targetAngle);
+        
+        // Smoothly rotate towards target
+        transform.rotation = Quaternion.RotateTowards(
+            transform.rotation, 
+            targetRotation, 
+            rotationSpeed * Time.deltaTime
+        );
+    }
+
+    private void UpdateAnimator()
+    {
+        if (animator == null) return;
+        
+        bool isMoving = currentSpeed > 0.1f;
+        
+        // Set IsMoving boolean parameter
+        animator.SetBool("isRunning", isMoving);
+        
+        // Calculate animation speed multiplier based on current movement speed
+        float speedMultiplier = currentSpeed / normalAnimationSpeed;
+        speedMultiplier = Mathf.Clamp(speedMultiplier, 0f, 3f); // Cap at 3x speed
+        
+        // Set Speed float parameter
+        animator.SetFloat(speedParameterName, speedMultiplier);
     }
 
     private Vector2 CalculateLeaderFollowing(float distanceToDog)
@@ -584,9 +657,16 @@ public class FlockingSheep : MonoBehaviour
         {
             t += Time.deltaTime * 2f;
             rb.linearVelocity = Vector2.Lerp(startVel, Vector2.zero, t);
+            
+            // Update current speed for animation
+            currentSpeed = rb.linearVelocity.magnitude;
+            UpdateAnimator();
+            
             yield return null;
         }
         rb.linearVelocity = Vector2.zero;
+        currentSpeed = 0f;
+        UpdateAnimator();
     }
 
     private IEnumerator AlertNearbyAllies()

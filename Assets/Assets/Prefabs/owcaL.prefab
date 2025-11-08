@@ -29,9 +29,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3953676745067263445}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 9.74, y: 10.19, z: 0}
-  m_LocalScale: {x: 0.46, y: 0.46, z: 0.46}
+  m_LocalScale: {x: 1.31, y: 1.31, z: 1.31}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Sprite: {fileID: -3609207279662956678, guid: 0cf262d562beb704cb469bff01871344, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -161,8 +161,8 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 0.55
+  m_Offset: {x: 0.01, y: -0.03}
+  m_Radius: 0.29
 --- !u!50 &5649622447709779691
 Rigidbody2D:
   serializedVersion: 5
@@ -207,7 +207,7 @@ MonoBehaviour:
   gateTarget: {fileID: 0}
   triggerCollider: {fileID: 6877329075009094211}
   minFleeSpeed: 0.2
-  maxFleeSpeed: 1.5
+  maxFleeSpeed: 4
   panicSpeedDistance: 3
   calmSpeedDistance: 12
   smoothStop: 1
@@ -224,19 +224,25 @@ MonoBehaviour:
   maxDogDistance: 10
   closeSteeringSpeed: 180
   farSteeringSpeed: 45
-  gateAttractionStartDistance: 40
-  gateAttractionForceDistance: 30
-  gateCaptureRadius: 3.41
+  gateAttractionStartDistance: 82.4
+  gateAttractionForceDistance: 81.3
+  gateCaptureRadius: 2.16
   maxGateInfluence: 0.598
   groupFollowCheckRadius: 30
   groupFollowMagnetismBoost: 0.588
   leaderFollowRadius: 20
   leaderStickiness: 7
   disperseDistance: 12
-  leaderFollowWeight: 0.935
+  leaderFollowWeight: 0.6
   chillMoveSpeed: 2
   chillUpdateInterval: 0.5
   alertRange: 3
   alertCooldown: 1
+  rotationSpeed: 360
+  spriteDirectionOffset: 0
+  animator: {fileID: 0}
+  speedParameterName: Speed
+  isMovingParameterName: IsMoving
+  normalAnimationSpeed: 5
   debugLogs: 0
   showSpeedDebug: 0
