@@ -10,10 +10,12 @@ public class FlockingSheep : MonoBehaviour
     public string threatTag = "Player";
     public string allyTag = "Sheep";
     public Transform gateTarget;
+    public Transform gateEndTransform;
 
     [Header("Collider Setup")]
     [Tooltip("Trigger collider (Is Trigger = true) - for fear spreading detection")]
     public Collider2D triggerCollider;
+    public Collider2D _collisionCollider;
 
     [Header("Flee Behavior - Speed")]
     public float minFleeSpeed = 3f;
@@ -47,6 +49,7 @@ public class FlockingSheep : MonoBehaviour
     public float gateCaptureRadius = 2f;
     [Range(0f, 1f)]
     public float maxGateInfluence = 0.9f;
+    public float postCaptureSpeed = 2f;
     
     [Header("Group Following")]
     public float groupFollowCheckRadius = 5f;
@@ -177,6 +180,74 @@ public class FlockingSheep : MonoBehaviour
         if (movementRoutine != null)
             StopCoroutine(movementRoutine);
         
+        // Start movement to end position if it exists
+        if (gateEndTransform != null)
+        {
+            movementRoutine = StartCoroutine(MoveToGateEnd());
+        }
+        else
+        {
+            // No end position - stop completely
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+                rb.bodyType = RigidbodyType2D.Kinematic;
+            }
+            
+            currentSpeed = 0f;
+            UpdateAnimator();
+        }
+        
+        if (debugLogs)
+            Debug.Log($"{name} captured at gate!", this);
+    }
+
+    private IEnumerator MoveToGateEnd()
+    {
+        if (gateEndTransform == null)
+        {
+            if (debugLogs)
+                Debug.LogWarning($"{name} - No gateEndTransform assigned!", this);
+            yield break;
+        }
+        
+        currentSpeed = postCaptureSpeed;
+        _collisionCollider.enabled = false;
+        
+        // Move towards end position
+        while (Vector2.Distance(transform.position, gateEndTransform.position) > 0.8f)
+        {
+            Vector2 direction = ((Vector2)gateEndTransform.position - (Vector2)transform.position).normalized;
+            currentDirection = direction;
+            
+            if (rb != null)
+            {
+                // Use MoveTowards for constant speed movement
+                Vector2 newPosition = Vector2.MoveTowards(
+                    rb.position, 
+                    gateEndTransform.position, 
+                    postCaptureSpeed * Time.deltaTime
+                );
+                rb.MovePosition(newPosition);
+            }
+            else
+            {
+                // Fallback if no rigidbody
+                transform.position = Vector2.MoveTowards(
+                    transform.position, 
+                    gateEndTransform.position, 
+                    postCaptureSpeed * Time.deltaTime
+                );
+            }
+            
+            UpdateVisualRotation();
+            UpdateAnimator();
+            
+            yield return null;
+        }
+        
+        // Reached end position - stop completely
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
@@ -188,7 +259,7 @@ public class FlockingSheep : MonoBehaviour
         UpdateAnimator();
         
         if (debugLogs)
-            Debug.Log($"{name} captured at gate!", this);
+            Debug.Log($"{name} reached gateEndTransform!", this);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -199,7 +270,7 @@ public class FlockingSheep : MonoBehaviour
         {
             dogTransform = other.transform;
             AlertAndRun();
-            
+        
             if (debugLogs)
                 Debug.Log($"{name} - Detected dog trigger", this);
         }
@@ -215,6 +286,25 @@ public class FlockingSheep : MonoBehaviour
                 dogTransform = ally.dogTransform;
                 AlertAndRun();
             }
+        }
+
+        if (other.CompareTag("plot"))
+        {
+            // Calculate reflection direction
+            Vector2 closestPoint = other.ClosestPoint(transform.position);
+            Vector2 collisionNormal = ((Vector2)transform.position - closestPoint).normalized;
+        
+            // Reflect current direction off the collision normal
+            currentDirection = Vector2.Reflect(currentDirection, collisionNormal);
+        
+            // Apply reflected direction immediately
+            if (rb != null)
+            {
+                rb.linearVelocity = currentDirection * currentSpeed;
+            }
+        
+            if (debugLogs)
+                Debug.Log($"{name} - Bounced off plot boundary! New direction: {currentDirection}", this);
         }
     }
 
@@ -438,16 +528,13 @@ public class FlockingSheep : MonoBehaviour
 
     private void UpdateVisualRotation()
     {
-        if (currentDirection.sqrMagnitude < 0.01f) return; // Don't rotate if not moving
+        if (currentDirection.sqrMagnitude < 0.01f) return;
         
-        // Calculate target angle from movement direction
         float targetAngle = Mathf.Atan2(currentDirection.y, currentDirection.x) * Mathf.Rad2Deg;
-        targetAngle -= 90f + spriteDirectionOffset; // Adjust for sprite facing up by default
+        targetAngle -= 90f + spriteDirectionOffset;
         
-        // Create target rotation
         Quaternion targetRotation = Quaternion.Euler(0f, 0f, targetAngle);
         
-        // Smoothly rotate towards target
         transform.rotation = Quaternion.RotateTowards(
             transform.rotation, 
             targetRotation, 
@@ -460,53 +547,36 @@ public class FlockingSheep : MonoBehaviour
         if (animator == null) return;
         
         bool isMoving = currentSpeed > 0.1f;
-        
-        // Set IsMoving boolean parameter
         animator.SetBool("isRunning", isMoving);
-        
-        // // Calculate animation speed multiplier based on current movement speed
-        // float speedMultiplier = currentSpeed / normalAnimationSpeed;
-        // speedMultiplier = Mathf.Clamp(speedMultiplier, 0f, 3f); // Cap at 3x speed
-        //
-        // // Set Speed float parameter
-        // animator.SetFloat("Speed", speedMultiplier);
     }
 
     private Vector2 CalculateLeaderFollowing(float distanceToDog)
     {
-        // Leader doesn't follow itself
         if (isLeader || currentLeader == null || currentLeader.CapturedByGate)
             return currentDirection;
         
         float distanceToLeader = Vector2.Distance(transform.position, currentLeader.transform.position);
         
-        // If dog is close, stick tight to leader
         if (distanceToDog < minDogDistance * 1.5f)
         {
-            if (distanceToLeader > 1f) // Stay very close
+            if (distanceToLeader > 1f)
             {
                 Vector2 towardsLeader = ((Vector2)currentLeader.transform.position - (Vector2)transform.position).normalized;
                 return towardsLeader;
             }
         }
         
-        // If dog is far and outside leader radius, disperse
         if (distanceToDog > disperseDistance && distanceToLeader > leaderFollowRadius)
         {
-            // Return to wandering - don't actively follow
             return currentDirection;
         }
         
-        // Medium distance: try to stay in leader's cluster
         if (distanceToLeader > leaderFollowRadius * 0.5f)
         {
             Vector2 towardsLeader = ((Vector2)currentLeader.transform.position - (Vector2)transform.position).normalized;
-            
-            // Blend with current direction to avoid sudden jerks
             return Vector2.Lerp(currentDirection, towardsLeader, leaderStickiness * Time.deltaTime).normalized;
         }
         
-        // Already close to leader, match leader's direction
         return Vector2.Lerp(currentDirection, currentLeader.currentDirection, 0.5f);
     }
 
@@ -554,7 +624,6 @@ public class FlockingSheep : MonoBehaviour
         float normalizedDistance = Mathf.InverseLerp(gateAttractionStartDistance, gateAttractionForceDistance, distanceToGate);
         float attractionStrength = Mathf.Pow(1f - normalizedDistance, 2f);
         
-        // Check if nearby group members reached the gate
         int capturedCount = CountNearbyCapturedSheep();
         float groupBoost = capturedCount > 0 ? groupFollowMagnetismBoost * Mathf.Min(capturedCount, 3) : 0f;
         
@@ -619,7 +688,6 @@ public class FlockingSheep : MonoBehaviour
             if (distance > 0)
                 separation += offset.normalized / distance;
             
-            // Weight leader's direction more heavily
             float alignmentWeight = sheep.isLeader ? 2f : 1f;
             alignment += sheep.currentDirection * alignmentWeight;
             
@@ -630,7 +698,6 @@ public class FlockingSheep : MonoBehaviour
         {
             alignment /= nearbyFlock.Count;
             
-            // If leader is nearby, use leader as cohesion target
             if (currentLeader != null && Vector2.Distance(transform.position, currentLeader.transform.position) < flockRadius)
             {
                 cohesion = (Vector2)currentLeader.transform.position - (Vector2)transform.position;
@@ -659,7 +726,6 @@ public class FlockingSheep : MonoBehaviour
             t += Time.deltaTime * 2f;
             rb.linearVelocity = Vector2.Lerp(startVel, Vector2.zero, t);
             
-            // Update current speed for animation
             currentSpeed = rb.linearVelocity.magnitude;
             UpdateAnimator();
             
@@ -726,7 +792,6 @@ public class FlockingSheep : MonoBehaviour
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(dogTransform.position, safeDistance);
             
-            // Draw disperse distance
             Gizmos.color = new Color(0f, 1f, 1f, 0.3f);
             Gizmos.DrawWireSphere(dogTransform.position, disperseDistance);
         }
@@ -737,14 +802,12 @@ public class FlockingSheep : MonoBehaviour
             Gizmos.DrawLine(transform.position, transform.position + (Vector3)currentDirection * 2f);
         }
         
-        // Draw leader connections
         if (Application.isPlaying && currentLeader != null && !isLeader && Alerted)
         {
             Gizmos.color = new Color(1f, 0f, 1f, 0.5f);
             Gizmos.DrawLine(transform.position, currentLeader.transform.position);
         }
         
-        // Highlight leader
         if (Application.isPlaying && isLeader)
         {
             Gizmos.color = Color.magenta;

@@ -191,6 +191,7 @@ public class DogMovement : MonoBehaviour
         if (context.started)
         {
             _currentSpeedMulti = 2; 
+            ShowRightMessageAndExpression.Instance.ChangeMessageSprite(MsgType.Push);
         }
         else if (context.canceled)
         {
