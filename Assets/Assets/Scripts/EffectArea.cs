@@ -11,6 +11,10 @@ public class ZoneEffectSimple : MonoBehaviour
     [Range(0, 100)] public float chancePercent = 30f;
     public float interval = 5f;
 
+    [Header("Stop na celu")]
+    [Min(0f)] public float holdAtTargetSeconds = 2f;
+
+
     [Header("Sterowanie do wyłączenia (opcjonalne)")]
     public Behaviour disableThisExactComponent;   // wyłączy dokładnie ten komponent
     public Behaviour componentTypeReference;      // albo wyłączy komponent po typie znaleziony na graczu
@@ -322,6 +326,15 @@ public class ZoneEffectSimple : MonoBehaviour
                 if (dir.sqrMagnitude <= (stopDistance * stopDistance))
                 {
                     if (debugLogs) Debug.Log("[Zone] Dotarto do celu (ptak zostaje).");
+                    if (rb != null) rb.linearVelocity = Vector2.zero;
+
+                    if (holdAtTargetSeconds > 0f)
+                        yield return new WaitForSeconds(holdAtTargetSeconds);
+
+
+                    var birds = GameObject.FindGameObjectsWithTag(birdTag);
+                    for (int i = 0; i < birds.Length; i++)
+                        if (birds[i] != null) Destroy(birds[i]);
                     break; // nie niszczymy ptaka
                 }
 

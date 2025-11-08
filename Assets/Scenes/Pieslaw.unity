@@ -1742,13 +1742,14 @@ MonoBehaviour:
   playerTransform: {fileID: 2006364504}
   chancePercent: 30
   interval: 5
+  holdAtTargetSeconds: 2
   disableThisExactComponent: {fileID: 2006364502}
   componentTypeReference: {fileID: 2006364502}
   searchInChildren: 1
   birdTarget: {fileID: 357769752}
   birdTag: Bird
   preferNearestTaggedBird: 1
-  moveSpeed: 5
+  moveSpeed: 3.5
   stopDistance: 0.2
   effectDuration: 10
   mashPerPress: 0.2
