@@ -145,6 +145,15 @@ public partial class @NewActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SlowWalk"",
+                    ""type"": ""Button"",
+                    ""id"": ""9e85ae8c-08f7-4aa2-ab6c-c2f44fd8db0b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -172,8 +181,30 @@ public partial class @NewActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""e3c45b1c-a921-48aa-8052-c5058a9063e1"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Right"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""8590db78-f61c-444a-be75-d47213122d85"",
                     ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Left"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c9c4ca08-fc4e-4f40-8328-ebcb10ed3ee6"",
+                    ""path"": ""<Keyboard>/leftArrow"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -213,6 +244,28 @@ public partial class @NewActions: IInputActionCollection2, IDisposable
                     ""action"": ""Sprint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fd01674f-7551-49b5-9aa8-8bc245bc30d1"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SlowWalk"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ad359223-5aaa-4271-b572-62182b670017"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SlowWalk"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -227,6 +280,7 @@ public partial class @NewActions: IInputActionCollection2, IDisposable
         m_Movement_Bark = m_Movement.FindAction("Bark", throwIfNotFound: true);
         m_Movement_Pet = m_Movement.FindAction("Pet", throwIfNotFound: true);
         m_Movement_Sprint = m_Movement.FindAction("Sprint", throwIfNotFound: true);
+        m_Movement_SlowWalk = m_Movement.FindAction("SlowWalk", throwIfNotFound: true);
     }
 
     ~@NewActions()
@@ -313,6 +367,7 @@ public partial class @NewActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Movement_Bark;
     private readonly InputAction m_Movement_Pet;
     private readonly InputAction m_Movement_Sprint;
+    private readonly InputAction m_Movement_SlowWalk;
     /// <summary>
     /// Provides access to input actions defined in input action map "Movement".
     /// </summary>
@@ -348,6 +403,10 @@ public partial class @NewActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Movement/Sprint".
         /// </summary>
         public InputAction @Sprint => m_Wrapper.m_Movement_Sprint;
+        /// <summary>
+        /// Provides access to the underlying input action "Movement/SlowWalk".
+        /// </summary>
+        public InputAction @SlowWalk => m_Wrapper.m_Movement_SlowWalk;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -392,6 +451,9 @@ public partial class @NewActions: IInputActionCollection2, IDisposable
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
+            @SlowWalk.started += instance.OnSlowWalk;
+            @SlowWalk.performed += instance.OnSlowWalk;
+            @SlowWalk.canceled += instance.OnSlowWalk;
         }
 
         /// <summary>
@@ -421,6 +483,9 @@ public partial class @NewActions: IInputActionCollection2, IDisposable
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
+            @SlowWalk.started -= instance.OnSlowWalk;
+            @SlowWalk.performed -= instance.OnSlowWalk;
+            @SlowWalk.canceled -= instance.OnSlowWalk;
         }
 
         /// <summary>
@@ -503,5 +568,12 @@ public partial class @NewActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSprint(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SlowWalk" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSlowWalk(InputAction.CallbackContext context);
     }
 }
