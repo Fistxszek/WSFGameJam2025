@@ -21,6 +21,8 @@ public class DogMovement : MonoBehaviour
 
     [SerializeField] private Transform Gate;
 
+    [SerializeField] private Animator _animator;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -88,10 +90,12 @@ public class DogMovement : MonoBehaviour
             Vector2 forwardDirection = transform.up; // In 2D, transform.up is the forward direction
             var speed = moveSpeed * _currentSpeedMulti;
             rb.linearVelocity = forwardDirection * speed;
+            _animator.SetBool("isRunning", true);
         }
         else
         {
             rb.linearVelocity = Vector2.zero;
+            _animator.SetBool("isRunning", false);
         }
     }
 

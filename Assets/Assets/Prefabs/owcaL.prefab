@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5649622447709779691}
   - component: {fileID: 3496376180364469205}
   m_Layer: 6
-  m_Name: owca
+  m_Name: owcaL
   m_TagString: Sheep
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
