@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 5125586468970597418}
   - component: {fileID: 7552580102814936324}
   - component: {fileID: 6877329075009094211}
+  - component: {fileID: 5733479673175277047}
   - component: {fileID: 5649622447709779691}
   - component: {fileID: 3496376180364469205}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: owca
   m_TagString: Sheep
   m_Icon: {fileID: 0}
@@ -126,6 +127,42 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 2.53
+--- !u!58 &5733479673175277047
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3953676745067263445}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 72
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 1.98
 --- !u!50 &5649622447709779691
 Rigidbody2D:
   serializedVersion: 5
@@ -152,7 +189,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!114 &3496376180364469205
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,22 +214,26 @@ MonoBehaviour:
   keepRunningDistance: 8
   safeDistance: 15
   stopDelay: 2
-  flockRadius: 3
+  flockRadius: 40
   separationWeight: 1.5
-  alignmentWeight: 8
-  cohesionWeight: 10
+  alignmentWeight: 1.5
+  cohesionWeight: 30
   minRandomness: 5
   maxRandomness: 45
   minDogDistance: 2
   maxDogDistance: 10
   closeSteeringSpeed: 180
   farSteeringSpeed: 45
-  gateAttractionStartDistance: 18.79
-  gateAttractionForceDistance: 10.87
+  gateAttractionStartDistance: 40
+  gateAttractionForceDistance: 30
   gateCaptureRadius: 3.41
-  maxGateInfluence: 0.097
-  groupFollowCheckRadius: 5
+  maxGateInfluence: 0.598
+  groupFollowCheckRadius: 30
   groupFollowMagnetismBoost: 0.588
+  leaderFollowRadius: 20
+  leaderStickiness: 7
+  disperseDistance: 12
+  leaderFollowWeight: 0.935
   chillMoveSpeed: 2
   chillUpdateInterval: 0.5
   alertRange: 3

@@ -98,9 +98,6 @@ public class DogMovement : MonoBehaviour
     // Called from Input Action for rotating left
     public void OnRotateLeft(InputAction.CallbackContext context)
     {
-        if (!isMoving )
-            return;
-        
         if (context.started)
         {
             rotationDirection = 1f; // Positive rotation (counterclockwise)
@@ -115,9 +112,6 @@ public class DogMovement : MonoBehaviour
     // Called from Input Action for rotating right
     public void OnRotateRight(InputAction.CallbackContext context)
     {
-        if (!isMoving )
-            return;
-        
         if (context.started)
         {
             rotationDirection = -1f; // Negative rotation (clockwise)
@@ -183,7 +177,7 @@ public class DogMovement : MonoBehaviour
         }
     }
 
-    private IEnumerator WaitForSprintReset()
+    private IEnumerator CommandDelay()
     {
         var baseRotSpeed = rotationSpeed;
         rotationSpeed *= 4;

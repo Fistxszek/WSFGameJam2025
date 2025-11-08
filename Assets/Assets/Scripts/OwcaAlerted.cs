@@ -52,6 +52,13 @@ public class FlockingSheep : MonoBehaviour
     [Range(0f, 1f)]
     public float groupFollowMagnetismBoost = 0.3f;
 
+    [Header("Leader System")]
+    public float leaderFollowRadius = 8f;
+    public float leaderStickiness = 2f;
+    public float disperseDistance = 12f;
+    [Range(0f, 1f)]
+    public float leaderFollowWeight = 0.7f;
+
     [Header("Non-Alerted Movement")]
     public float chillMoveSpeed = 2f;
     public float chillUpdateInterval = 0.5f;
@@ -76,6 +83,8 @@ public class FlockingSheep : MonoBehaviour
     private List<FlockingSheep> nearbyFlock = new List<FlockingSheep>();
     
     private static List<FlockingSheep> allSheep = new List<FlockingSheep>();
+    private static FlockingSheep currentLeader = null;
+    private bool isLeader = false;
 
     void Awake()
     {
@@ -108,6 +117,11 @@ public class FlockingSheep : MonoBehaviour
     void OnDestroy()
     {
         allSheep.Remove(this);
+        
+        if (isLeader && currentLeader == this)
+        {
+            currentLeader = null;
+        }
     }
 
     void Start()
@@ -131,6 +145,13 @@ public class FlockingSheep : MonoBehaviour
     {
         CapturedByGate = true;
         Alerted = false;
+        
+        if (isLeader)
+        {
+            isLeader = false;
+            if (currentLeader == this)
+                currentLeader = null;
+        }
         
         if (movementRoutine != null)
             StopCoroutine(movementRoutine);
@@ -235,14 +256,67 @@ public class FlockingSheep : MonoBehaviour
             StartCoroutine(AlertNearbyAllies());
     }
 
+    private void UpdateLeaderStatus()
+    {
+        if (dogTransform == null) return;
+        
+        // If no leader exists, first alerted sheep becomes leader
+        if (currentLeader == null && Alerted && !CapturedByGate)
+        {
+            SetAsLeader();
+            return;
+        }
+        
+        // If current leader is captured, reassign
+        if (currentLeader != null && currentLeader.CapturedByGate)
+        {
+            currentLeader = null;
+            
+            // Find new leader: closest alerted sheep to dog
+            FlockingSheep closestSheep = null;
+            float closestDist = float.MaxValue;
+            
+            foreach (var sheep in allSheep)
+            {
+                if (sheep.Alerted && !sheep.CapturedByGate)
+                {
+                    float dist = Vector2.Distance(sheep.transform.position, dogTransform.position);
+                    if (dist < closestDist)
+                    {
+                        closestDist = dist;
+                        closestSheep = sheep;
+                    }
+                }
+            }
+            
+            if (closestSheep != null)
+                closestSheep.SetAsLeader();
+        }
+    }
+
+    private void SetAsLeader()
+    {
+        if (currentLeader != null)
+            currentLeader.isLeader = false;
+        
+        currentLeader = this;
+        isLeader = true;
+        
+        if (debugLogs)
+            Debug.Log($"{name} is now the LEADER", this);
+    }
+
     private IEnumerator AlertedFleeRoutine()
     {
         float safeTimer = 0f;
+        UpdateLeaderStatus();
         
         while (!CapturedByGate)
         {
             float distanceToDog = dogTransform != null ? 
                 Vector2.Distance(transform.position, dogTransform.position) : float.MaxValue;
+            
+            UpdateLeaderStatus();
             
             if (distanceToDog < keepRunningDistance)
             {
@@ -273,16 +347,25 @@ public class FlockingSheep : MonoBehaviour
             UpdateNearbyFlock();
             Vector2 flockingInfluence = CalculateFlockingDirection();
             
+            // Calculate leader-following behavior
+            Vector2 leaderInfluence = CalculateLeaderFollowing(distanceToDog);
+            
             float distanceToDogNorm = Mathf.InverseLerp(minDogDistance, maxDogDistance, distanceToDog);
             float flockingWeight = Mathf.Lerp(0.2f, 0.5f, distanceToDogNorm);
             
-            Vector2 blendedDirection = Vector2.Lerp(primaryFleeDir, flockingInfluence, flockingWeight).normalized;
+            // Leader influence gets stronger when dog is close
+            float leaderWeight = isLeader ? 0f : Mathf.Lerp(leaderFollowWeight, 0.2f, distanceToDogNorm);
             
-            blendedDirection = SmoothSteerTowards(currentDirection, blendedDirection, distanceToDog);
+            // Blend flee, flocking, and leader-following
+            Vector2 combinedDirection = primaryFleeDir;
+            combinedDirection = Vector2.Lerp(combinedDirection, flockingInfluence, flockingWeight);
+            combinedDirection = Vector2.Lerp(combinedDirection, leaderInfluence, leaderWeight);
+            combinedDirection = combinedDirection.normalized;
             
-            blendedDirection = ApplyGateMagnetism(blendedDirection);
+            combinedDirection = SmoothSteerTowards(currentDirection, combinedDirection, distanceToDog);
+            combinedDirection = ApplyGateMagnetism(combinedDirection);
             
-            currentDirection = blendedDirection;
+            currentDirection = combinedDirection;
             currentSpeed = CalculatePanicSpeed();
             
             if (rb != null && !CapturedByGate)
@@ -295,6 +378,13 @@ public class FlockingSheep : MonoBehaviour
 
         if (!CapturedByGate)
         {
+            if (isLeader)
+            {
+                isLeader = false;
+                if (currentLeader == this)
+                    currentLeader = null;
+            }
+            
             if (rb != null)
             {
                 if (smoothStop)
@@ -306,6 +396,44 @@ public class FlockingSheep : MonoBehaviour
             movementRoutine = null;
             Alerted = false;
         }
+    }
+
+    private Vector2 CalculateLeaderFollowing(float distanceToDog)
+    {
+        // Leader doesn't follow itself
+        if (isLeader || currentLeader == null || currentLeader.CapturedByGate)
+            return currentDirection;
+        
+        float distanceToLeader = Vector2.Distance(transform.position, currentLeader.transform.position);
+        
+        // If dog is close, stick tight to leader
+        if (distanceToDog < minDogDistance * 1.5f)
+        {
+            if (distanceToLeader > 1f) // Stay very close
+            {
+                Vector2 towardsLeader = ((Vector2)currentLeader.transform.position - (Vector2)transform.position).normalized;
+                return towardsLeader;
+            }
+        }
+        
+        // If dog is far and outside leader radius, disperse
+        if (distanceToDog > disperseDistance && distanceToLeader > leaderFollowRadius)
+        {
+            // Return to wandering - don't actively follow
+            return currentDirection;
+        }
+        
+        // Medium distance: try to stay in leader's cluster
+        if (distanceToLeader > leaderFollowRadius * 0.5f)
+        {
+            Vector2 towardsLeader = ((Vector2)currentLeader.transform.position - (Vector2)transform.position).normalized;
+            
+            // Blend with current direction to avoid sudden jerks
+            return Vector2.Lerp(currentDirection, towardsLeader, leaderStickiness * Time.deltaTime).normalized;
+        }
+        
+        // Already close to leader, match leader's direction
+        return Vector2.Lerp(currentDirection, currentLeader.currentDirection, 0.5f);
     }
 
     private float CalculatePanicSpeed()
@@ -417,14 +545,27 @@ public class FlockingSheep : MonoBehaviour
             if (distance > 0)
                 separation += offset.normalized / distance;
             
-            alignment += sheep.currentDirection;
+            // Weight leader's direction more heavily
+            float alignmentWeight = sheep.isLeader ? 2f : 1f;
+            alignment += sheep.currentDirection * alignmentWeight;
+            
             cohesion += (Vector2)sheep.transform.position;
         }
 
         if (nearbyFlock.Count > 0)
         {
             alignment /= nearbyFlock.Count;
-            cohesion = (cohesion / nearbyFlock.Count) - (Vector2)transform.position;
+            
+            // If leader is nearby, use leader as cohesion target
+            if (currentLeader != null && Vector2.Distance(transform.position, currentLeader.transform.position) < flockRadius)
+            {
+                cohesion = (Vector2)currentLeader.transform.position - (Vector2)transform.position;
+            }
+            else
+            {
+                cohesion = (cohesion / nearbyFlock.Count) - (Vector2)transform.position;
+            }
+            
             cohesion = cohesion.normalized;
         }
 
@@ -503,12 +644,33 @@ public class FlockingSheep : MonoBehaviour
             
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(dogTransform.position, safeDistance);
+            
+            // Draw disperse distance
+            Gizmos.color = new Color(0f, 1f, 1f, 0.3f);
+            Gizmos.DrawWireSphere(dogTransform.position, disperseDistance);
         }
         
         if (Application.isPlaying && !CapturedByGate)
         {
             Gizmos.color = Color.green;
             Gizmos.DrawLine(transform.position, transform.position + (Vector3)currentDirection * 2f);
+        }
+        
+        // Draw leader connections
+        if (Application.isPlaying && currentLeader != null && !isLeader && Alerted)
+        {
+            Gizmos.color = new Color(1f, 0f, 1f, 0.5f);
+            Gizmos.DrawLine(transform.position, currentLeader.transform.position);
+        }
+        
+        // Highlight leader
+        if (Application.isPlaying && isLeader)
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawWireSphere(transform.position, 1f);
+            
+            Gizmos.color = new Color(1f, 0f, 1f, 0.2f);
+            Gizmos.DrawWireSphere(transform.position, leaderFollowRadius);
         }
     }
 }
