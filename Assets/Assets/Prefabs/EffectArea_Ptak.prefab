@@ -1,0 +1,212 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &286445338547035778
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3620669444056832474}
+  - component: {fileID: 5831439231040861700}
+  - component: {fileID: 6673874073466052572}
+  - component: {fileID: 796093809747368937}
+  m_Layer: 0
+  m_Name: EffectArea_Ptak
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3620669444056832474
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286445338547035778}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 27.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5831439231040861700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286445338547035778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b161303d3fcfec64e81f6f505514b7a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerTag: Player
+  playerTransform: {fileID: 0}
+  chancePercent: 30
+  interval: 5
+  holdAtTargetSeconds: 2
+  disableThisExactComponent: {fileID: 0}
+  componentTypeReference: {fileID: 0}
+  searchInChildren: 1
+  birdTarget: {fileID: 0}
+  birdTag: Bird
+  preferNearestTaggedBird: 1
+  moveSpeed: 3.5
+  stopDistance: 0.2
+  effectDuration: 10
+  mashPerPress: 0.2
+  mashDecayPerSecond: 0.25
+  mashKey: 101
+  mashSliders:
+  - {fileID: 0}
+  OnMashValueChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  smoothTakeover: 1
+  takeoverEaseIn: 0.35
+  takeoverCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  rotateLerpSpeed: 12
+  effectBanner: {fileID: 0}
+  bannerHiddenPos: {x: -1000, y: 0}
+  bannerShownPos: {x: 10, y: 0}
+  bannerSlideDuration: 0.25
+  bannerSlideCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  bannerPulseAmplitude: 0.06
+  bannerPulseFrequency: 3
+  bannerUseUnscaledTime: 1
+  bannerCanvasGroup: {fileID: 0}
+  destroyAllBirdsOnMashInterrupt: 1
+  birdRespawnDelay: 5
+  OnRespawnRequested:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 796093809747368937}
+        m_TargetAssemblyTypeName: RandomSpawner2D, Assembly-CSharp
+        m_MethodName: SpawnObjectsCount
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  debugLogs: 1
+--- !u!61 &6673874073466052572
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286445338547035778}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 20, y: 20}
+  m_EdgeRadius: 0
+--- !u!114 &796093809747368937
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286445338547035778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2c5e746f2688ed4e925f5627724b382, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnArea: {fileID: 6673874073466052572}
+  requiredTag: 
+  prefabToSpawn: {fileID: 3073188288422497666, guid: f117daa678dfb2a4f87ee6978e45ad80, type: 3}
+  spawnCountOnEnter: 1
+  parentSpawnedToThis: 1
+  spawnOnTriggerEnter: 1
+  lastSpawned: {fileID: 0}

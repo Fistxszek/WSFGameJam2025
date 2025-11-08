@@ -464,12 +464,12 @@ public class FlockingSheep : MonoBehaviour
         // Set IsMoving boolean parameter
         animator.SetBool("isRunning", isMoving);
         
-        // Calculate animation speed multiplier based on current movement speed
-        float speedMultiplier = currentSpeed / normalAnimationSpeed;
-        speedMultiplier = Mathf.Clamp(speedMultiplier, 0f, 3f); // Cap at 3x speed
-        
-        // Set Speed float parameter
-        animator.SetFloat(speedParameterName, speedMultiplier);
+        // // Calculate animation speed multiplier based on current movement speed
+        // float speedMultiplier = currentSpeed / normalAnimationSpeed;
+        // speedMultiplier = Mathf.Clamp(speedMultiplier, 0f, 3f); // Cap at 3x speed
+        //
+        // // Set Speed float parameter
+        // animator.SetFloat("Speed", speedMultiplier);
     }
 
     private Vector2 CalculateLeaderFollowing(float distanceToDog)

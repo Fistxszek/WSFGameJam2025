@@ -16,8 +16,8 @@ public class ZoneEffectSimple : MonoBehaviour
 
 
     [Header("Sterowanie do wyłączenia (opcjonalne)")]
-    public Behaviour disableThisExactComponent;   // wyłączy dokładnie ten komponent
-    public Behaviour componentTypeReference;      // albo wyłączy komponent po typie znaleziony na graczu
+    public DogMovement disableThisExactComponent;   // wyłączy dokładnie ten komponent
+    public DogMovement componentTypeReference;      // albo wyłączy komponent po typie znaleziony na graczu
     public bool searchInChildren = true;
 
     [Header("Cele (ptaki) – tylko istniejące")]
