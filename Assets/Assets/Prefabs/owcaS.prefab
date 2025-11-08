@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5733479673175277047}
   - component: {fileID: 5649622447709779691}
   - component: {fileID: 3496376180364469205}
+  - component: {fileID: 3198944817689599308}
   m_Layer: 6
   m_Name: owcaS
   m_TagString: Sheep
@@ -29,9 +30,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3953676745067263445}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 9.74, y: 10.19, z: 0}
-  m_LocalScale: {x: 0.46, y: 0.46, z: 0.46}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -80,7 +81,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Sprite: {fileID: -7222106238199686222, guid: 0cf262d562beb704cb469bff01871344, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -238,5 +239,33 @@ MonoBehaviour:
   chillUpdateInterval: 0.5
   alertRange: 3
   alertCooldown: 1
+  rotationSpeed: 360
+  spriteDirectionOffset: 0
+  animator: {fileID: 0}
+  speedParameterName: Speed
+  isMovingParameterName: IsMoving
+  normalAnimationSpeed: 5
   debugLogs: 0
   showSpeedDebug: 0
+--- !u!95 &3198944817689599308
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3953676745067263445}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c1c9da4a3b485bf45bb3ebf8c8283a08, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

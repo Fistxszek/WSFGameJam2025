@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5733479673175277047}
   - component: {fileID: 5649622447709779691}
   - component: {fileID: 3496376180364469205}
+  - component: {fileID: 5808922187669436094}
   m_Layer: 6
   m_Name: owcaL
   m_TagString: Sheep
@@ -246,3 +247,25 @@ MonoBehaviour:
   normalAnimationSpeed: 5
   debugLogs: 0
   showSpeedDebug: 0
+--- !u!95 &5808922187669436094
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3953676745067263445}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f4a8a11ff8b11a4479820e6cfdbba86f, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
