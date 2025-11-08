@@ -461,7 +461,7 @@ public class FlockingSheep : MonoBehaviour
         bool isMoving = currentSpeed > 0.1f;
         
         // Set IsMoving boolean parameter
-        animator.SetBool(isMovingParameterName, isMoving);
+        animator.SetBool("isRunning", isMoving);
         
         // Calculate animation speed multiplier based on current movement speed
         float speedMultiplier = currentSpeed / normalAnimationSpeed;
