@@ -206,19 +206,21 @@ MonoBehaviour:
   threatTag: Player
   allyTag: Sheep
   gateTarget: {fileID: 0}
+  gateEndTransform: {fileID: 0}
   triggerCollider: {fileID: 6877329075009094211}
+  _collisionCollider: {fileID: 5733479673175277047}
   minFleeSpeed: 0.2
-  maxFleeSpeed: 1.5
+  maxFleeSpeed: 2
   panicSpeedDistance: 3
   calmSpeedDistance: 12
   smoothStop: 1
   keepRunningDistance: 8
   safeDistance: 15
   stopDelay: 2
-  flockRadius: 40
+  flockRadius: 10
   separationWeight: 1.5
   alignmentWeight: 1.5
-  cohesionWeight: 30
+  cohesionWeight: 50
   minRandomness: 5
   maxRandomness: 45
   minDogDistance: 2
@@ -227,21 +229,22 @@ MonoBehaviour:
   farSteeringSpeed: 45
   gateAttractionStartDistance: 40
   gateAttractionForceDistance: 30
-  gateCaptureRadius: 3.41
-  maxGateInfluence: 0.598
+  gateCaptureRadius: 2
+  maxGateInfluence: 1
+  postCaptureSpeed: 2
   groupFollowCheckRadius: 30
-  groupFollowMagnetismBoost: 0.588
+  groupFollowMagnetismBoost: 0.646
   leaderFollowRadius: 20
   leaderStickiness: 7
   disperseDistance: 12
-  leaderFollowWeight: 0.935
+  leaderFollowWeight: 0.42
   chillMoveSpeed: 2
   chillUpdateInterval: 0.5
   alertRange: 3
   alertCooldown: 1
   rotationSpeed: 360
   spriteDirectionOffset: 0
-  animator: {fileID: 0}
+  animator: {fileID: 3198944817689599308}
   speedParameterName: Speed
   isMovingParameterName: IsMoving
   normalAnimationSpeed: 5
