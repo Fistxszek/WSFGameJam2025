@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 6add8f7d1f28f114588cfaf86efe87aa
+guid: ff17c35d593de49498537d1da67d3e16
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5304299067438366786
-    second: Event_listonosz_0
+      213: -38880815377803648
+    second: Event_listonosz(1)_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,23 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Event_listonosz_0
+      name: Event_listonosz(1)_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 128
         height: 64
-      alignment: 5
-      pivot: {x: 1, y: 0.5}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 240891106e7ac9940800000000000000
-      internalID: 5304299067438366786
+      spriteID: 08614daba1ed57ff0800000000000000
+      internalID: -38880815377803648
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: c10db4f587a4f5e4a8a7f0944e738bd3
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Event_listonosz_0: 5304299067438366786
+      Event_listonosz(1)_0: -38880815377803648
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
