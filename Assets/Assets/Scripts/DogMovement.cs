@@ -159,28 +159,6 @@ public class DogMovement : MonoBehaviour
     }
 
     // Rest of your existing methods...
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Jezioro"))
-        {
-            _animator.SetBool("isSwimming", true);
-            _currentSpeedMulti = 0.5f;
-            Debug.Log("plywanie");
-        }
-
-    }
-
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("Jezioro"))
-        {
-            _animator.SetBool("isSwimming", false);
-            _currentSpeedMulti = 1;
-            Debug.Log("NIEplywanie");
-        }
-
-    }
-
     public void OnRotateLeft(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -197,12 +175,11 @@ public class DogMovement : MonoBehaviour
         }
     }
 
-    // Called from Input Action for rotating right
     public void OnRotateRight(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
-            rotationDirection = -1f; // Negative rotation (clockwise)
+            rotationDirection = -1f;
             ShowRightMessageAndExpression.Instance.ChangeMessageSprite(MsgType.Right);
             _rightActive = true;
         }
@@ -214,7 +191,6 @@ public class DogMovement : MonoBehaviour
         }
     }
 
-    // Called from Input Action for toggling movement
     public void OnToggleMovement(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -231,17 +207,10 @@ public class DogMovement : MonoBehaviour
     
     void FaceTarget()
     {
-        // Calculate direction to target
         Vector2 direction = Gate.position - transform.position;
-    
-        // Calculate angle in degrees
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-    
-        // Apply rotation (subtract 90 if your sprite faces up by default)
         transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
     }
-
-    private float baseRotSpeed;
 
     public void OnSprintEnabled(InputAction.CallbackContext context)
     {
@@ -272,9 +241,7 @@ public class DogMovement : MonoBehaviour
     {
         var baseRotSpeed = rotationSpeed;
         rotationSpeed *= 4;
-        // _currentSpeedMulti = _speedMulti;
         yield return new WaitForSeconds(_sprintLength);
-        // _currentSpeedMulti = 1;
         rotationSpeed = baseRotSpeed;
     }
 }
