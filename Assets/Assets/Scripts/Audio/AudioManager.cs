@@ -14,7 +14,6 @@ public class AudioManager : MonoBehaviour
     private EventInstance ambienceEventInstance;
     private EventInstance voEventInstance;
     private Coroutine _voCoroutine;
-    [SerializeField, Range(0.1f, 1.5f)] private float _voDelayTime;
     public EventInstance musicEventInstance { get; private set; }
 
     private void Awake()
@@ -45,6 +44,11 @@ public class AudioManager : MonoBehaviour
         RuntimeManager.PlayOneShot(sound);
     }
 
+    public void StopAllSounds()
+    {
+        Bus masterBus = RuntimeManager.GetBus("bus:/");
+        masterBus.stopAllEvents(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+    }
     private void InitializeAmbience(EventReference ambienceEventReference)
     {
         ambienceEventInstance = CreateInstance(ambienceEventReference);

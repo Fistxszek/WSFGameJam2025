@@ -248,6 +248,10 @@ MonoBehaviour:
   speedParameterName: Speed
   isMovingParameterName: IsMoving
   normalAnimationSpeed: 5
+  colorVariation1: {r: 1, g: 1, b: 1, a: 1}
+  colorVariation2: {r: 0.2688679, g: 0.16656283, b: 0.11541028, a: 1}
+  enableColorVariation: 1
+  colorVariationChance: 20
   debugLogs: 0
   showSpeedDebug: 0
 --- !u!95 &4514215610973194806

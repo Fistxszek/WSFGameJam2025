@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{58192b69-b6d2-45a1-a668-02c7e467320c}">
+		<property name="assetPath">
+			<value>S_listonosz.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>96</value>
+		</property>
+		<property name="channelCount">
+			<value>1</value>
+		</property>
+		<property name="length">
+			<value>1.5700208333333334</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{02370e55-d752-4a4e-a3ce-0689a59fe425}</destination>
+		</relationship>
+	</object>
+</objects>

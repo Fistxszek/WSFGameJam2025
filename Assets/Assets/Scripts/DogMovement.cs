@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using FMODUnity; // Add FMOD namespace
 
 public class DogMovement : MonoBehaviour
 {
@@ -9,23 +10,40 @@ public class DogMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
     
     [Header("Rotation Settings")]
-    [SerializeField] private float rotationSpeed = 90f; // Degrees per second
+    [SerializeField] private float rotationSpeed = 90f;
     
-    private Rigidbody2D rb;
-    private bool isMoving = false;
-    private float rotationDirection = 0f; // -1 for left, 1 for right, 0 for no rotation
     [Header("Sprint settings")]
     private float _currentSpeedMulti = 1;
     [SerializeField] private float _slowWalkSpeed;
     [SerializeField] private float _sprintLength;
-
+    
+    [Tooltip("Optional: Parameter name to control speed (e.g., 'Speed' or 'Intensity')")]
+    [SerializeField] private string speedParameterName = "Speed";
+    [SerializeField] private bool useSpeedParameter = false;
+    
     [SerializeField] private Transform Gate;
-
     [SerializeField] private Animator _animator;
+    
+    private Rigidbody2D rb;
+    private bool isMoving = false;
+    private float rotationDirection = 0f;
+    private bool _leftActive;
+    private bool _rightActive;
+    
+    // FMOD instance
+    private FMOD.Studio.EventInstance runningAudioInstance;
+    private bool audioIsPlaying = false;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        
+        // Create FMOD event instance
+        if (!FMODEvents.Instance.DogRun.IsNull)
+        {
+            runningAudioInstance = RuntimeManager.CreateInstance(FMODEvents.Instance.DogRun);
+            RuntimeManager.AttachInstanceToGameObject(runningAudioInstance, transform);
+        }
     }
 
     private void OnEnable()
@@ -33,6 +51,10 @@ public class DogMovement : MonoBehaviour
         StartCoroutine(EnableInputEvents());
     }
 
+    private void PlayMumbleSfx(InputAction.CallbackContext context)
+    {
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.DziadMumble);
+    }
     private IEnumerator EnableInputEvents()
     {
         while (!GameManager.Instance)
@@ -54,7 +76,11 @@ public class DogMovement : MonoBehaviour
 
         input.Movement.SlowWalk.started += OnSlowWalkEnabled;
         input.Movement.SlowWalk.canceled += OnSlowWalkEnabled;
+        
+        
+        input.Movement.StartStop.started += PlayMumbleSfx;
     }
+
     private void OnDisable()
     {
         var input = GameManager.Instance?.controls;
@@ -73,6 +99,19 @@ public class DogMovement : MonoBehaviour
         
         input.Movement.SlowWalk.started -= OnSlowWalkEnabled;
         input.Movement.SlowWalk.canceled -= OnSlowWalkEnabled;
+        
+        
+        input.Movement.StartStop.started -= PlayMumbleSfx;
+    }
+
+    private void OnDestroy()
+    {
+        // Clean up FMOD instance
+        if (runningAudioInstance.isValid())
+        {
+            runningAudioInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            runningAudioInstance.release();
+        }
     }
 
     private void FixedUpdate()
@@ -87,48 +126,44 @@ public class DogMovement : MonoBehaviour
         // Move forward in current direction if moving is enabled
         if (isMoving)
         {
-            Vector2 forwardDirection = transform.up; // In 2D, transform.up is the forward direction
+            Vector2 forwardDirection = transform.up;
             var speed = moveSpeed * _currentSpeedMulti;
             rb.linearVelocity = forwardDirection * speed;
             _animator.SetBool("isRunning", true);
+            
+            // Start audio if not already playing
+            if (!audioIsPlaying && runningAudioInstance.isValid())
+            {
+                runningAudioInstance.start();
+                audioIsPlaying = true;
+            }
+            
+            // Update speed parameter if enabled
+            if (useSpeedParameter && audioIsPlaying && !string.IsNullOrEmpty(speedParameterName))
+            {
+                runningAudioInstance.setParameterByName(speedParameterName, _currentSpeedMulti);
+            }
         }
         else
         {
             rb.linearVelocity = Vector2.zero;
             _animator.SetBool("isRunning", false);
+            
+            // Stop audio if playing
+            if (audioIsPlaying && runningAudioInstance.isValid())
+            {
+                runningAudioInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                audioIsPlaying = false;
+            }
         }
     }
 
-    // private void OnTriggerEnter2D(Collider2D other)
-    // {
-    //     if (other.CompareTag("jezioro"))
-    //     {
-    //         _animator.SetBool("isSwimming", true);
-    //         _currentSpeedMulti = 0.5f;
-    //         Debug.Log("p�ywanie");
-    //     }
-    //
-    // }
-    //
-    // private void OnTriggerExit2D(Collider2D other)
-    // {
-    //     if (other.CompareTag("jezioro"))
-    //     {
-    //         _animator.SetBool("isSwimming", false);
-    //         _currentSpeedMulti = 1;
-    //         Debug.Log("NIEp�ywanie");
-    //     }
-    //
-    // }
-
-    private bool _leftActive;
-    private bool _rightActive;
-    // Called from Input Action for rotating left
+    // Rest of your existing methods...
     public void OnRotateLeft(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
-            rotationDirection = 1f; // Positive rotation (counterclockwise)
+            rotationDirection = 1f;
             ShowRightMessageAndExpression.Instance.ChangeMessageSprite(MsgType.Left);
             _leftActive = true;
         }
@@ -140,12 +175,11 @@ public class DogMovement : MonoBehaviour
         }
     }
 
-    // Called from Input Action for rotating right
     public void OnRotateRight(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
-            rotationDirection = -1f; // Negative rotation (clockwise)
+            rotationDirection = -1f;
             ShowRightMessageAndExpression.Instance.ChangeMessageSprite(MsgType.Right);
             _rightActive = true;
         }
@@ -157,7 +191,6 @@ public class DogMovement : MonoBehaviour
         }
     }
 
-    // Called from Input Action for toggling movement
     public void OnToggleMovement(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -174,17 +207,10 @@ public class DogMovement : MonoBehaviour
     
     void FaceTarget()
     {
-        // Calculate direction to target
         Vector2 direction = Gate.position - transform.position;
-    
-        // Calculate angle in degrees
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-    
-        // Apply rotation (subtract 90 if your sprite faces up by default)
         transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
     }
-
-    private float baseRotSpeed;
 
     public void OnSprintEnabled(InputAction.CallbackContext context)
     {
@@ -197,17 +223,8 @@ public class DogMovement : MonoBehaviour
         {
             _currentSpeedMulti = 1;
         }
-        // if (context.started)
-        // {
-        //     baseRotSpeed = rotationSpeed;
-        //     rotationSpeed *= 4;
-        //     ShowRightMessageAndExpression.Instance.ChangeMessageSprite(MsgType.Push);
-        // }
-        // else if (context.canceled)
-        // {
-        //     rotationSpeed = baseRotSpeed;
-        // }
     }
+
     public void OnSlowWalkEnabled(InputAction.CallbackContext context)
     {
         if (context.started)
@@ -224,9 +241,7 @@ public class DogMovement : MonoBehaviour
     {
         var baseRotSpeed = rotationSpeed;
         rotationSpeed *= 4;
-        // _currentSpeedMulti = _speedMulti;
         yield return new WaitForSeconds(_sprintLength);
-        // _currentSpeedMulti = 1;
         rotationSpeed = baseRotSpeed;
     }
 }

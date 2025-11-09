@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{fe6439f3-80ba-420c-94d7-d483348fbe0e}">
+		<property name="assetPath">
+			<value>S_koniec_czasu_alarm.wav</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>96</value>
+		</property>
+		<property name="channelCount">
+			<value>1</value>
+		</property>
+		<property name="length">
+			<value>12.566958333333334</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{02370e55-d752-4a4e-a3ce-0689a59fe425}</destination>
+		</relationship>
+	</object>
+</objects>

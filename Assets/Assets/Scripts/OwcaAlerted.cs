@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class FlockingSheep : MonoBehaviour
@@ -83,6 +84,19 @@ public class FlockingSheep : MonoBehaviour
     [Tooltip("Speed at which animation plays at 1x speed")]
     public float normalAnimationSpeed = 5f;
     
+    [Header("Color Variation")]
+    [SerializeField] private Color colorVariation1 = Color.white;
+    [SerializeField] private Color colorVariation2 = Color.white;
+    [Tooltip("If enabled, each sheep gets a random color between colorVariation1 and colorVariation2")]
+    [SerializeField] private bool enableColorVariation = true;
+    [Range(0f, 100f)]
+    [Tooltip("Percentage chance that a sheep will have color variation (0% = all white, 100% = all varied)")]
+    [SerializeField] private float colorVariationChance = 100f;
+
+
+    private SpriteRenderer spriteRenderer;
+
+    
     [Header("Debug")]
     public bool debugLogs = false;
     public bool showSpeedDebug = false;
@@ -101,15 +115,40 @@ public class FlockingSheep : MonoBehaviour
     private static List<FlockingSheep> allSheep = new List<FlockingSheep>();
     private static FlockingSheep currentLeader = null;
     private bool isLeader = false;
+    
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        
-        // Auto-assign Animator if not set
-        if (animator == null)
+    
+        // Get SpriteRenderer and apply color variation
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+    
+        if (spriteRenderer != null && enableColorVariation)
         {
-            animator = GetComponent<Animator>();
+            // Check if this sheep should get color variation based on percentage
+            float randomRoll = Random.value * 100f; // Returns 0-100
+        
+            if (randomRoll < colorVariationChance)
+            {
+                // Apply color variation
+                float randomLerp = Random.Range(0f, 1f);
+                Color randomColor = Color.Lerp(colorVariation1, colorVariation2, randomLerp);
+                spriteRenderer.color = randomColor;
+            
+                if (debugLogs)
+                    Debug.Log($"{name} - Assigned color variation: {randomColor} (lerp: {randomLerp:F2}, roll: {randomRoll:F1}%)", this);
+            }
+            else
+            {
+                // Keep default white
+                spriteRenderer.color = Color.white;
+            
+                if (debugLogs)
+                    Debug.Log($"{name} - Kept default white color (roll: {randomRoll:F1}% >= {colorVariationChance}%)", this);
+            }
             if (animator == null)
                 animator = GetComponentInChildren<Animator>();
         }
@@ -198,7 +237,8 @@ public class FlockingSheep : MonoBehaviour
             currentSpeed = 0f;
             UpdateAnimator();
         }
-        
+
+        GameManager.Instance._sheepSaved++;
         if (debugLogs)
             Debug.Log($"{name} captured at gate!", this);
     }
@@ -363,6 +403,9 @@ public class FlockingSheep : MonoBehaviour
         if (Alerted || CapturedByGate) return;
 
         Alerted = true;
+        
+        //sfx
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.OwcaRun);
         
         if (dogTransform != null)
         {

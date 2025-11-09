@@ -36,11 +36,11 @@ public class TimerManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
         
         timeRemaining = gameDuration;
     }
 
+    private bool _isPlayingSfx = false;
     private void Update()
     {
         if (timerIsRunning)
@@ -49,6 +49,11 @@ public class TimerManager : MonoBehaviour
             {
                 timeRemaining -= Time.deltaTime;
                 OnTimerTick?.Invoke(timeRemaining);
+                if (timeRemaining <= 10 && _isPlayingSfx)
+                {
+                   AudioManager.Instance.PlayOneShot(FMODEvents.Instance.CzasTykanie);
+                   _isPlayingSfx = true;
+                }
             }
             else
             {

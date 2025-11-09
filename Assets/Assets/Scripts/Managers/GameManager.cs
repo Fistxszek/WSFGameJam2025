@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
 
     public NewActions controls;
 
+    public int _sheepSaved = 0;
+
     private void Awake()
     {
         if (Instance != null)
@@ -30,15 +32,18 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
        TimerManager.Instance.StartTimer(); 
+       AudioManager.Instance.InitializeSceneAudio();
     }
 
     public void OnPlayAgainBtn()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
     }
 
     public void OnMainMenuBtn()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 }

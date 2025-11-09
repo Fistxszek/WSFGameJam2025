@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using FMODUnity;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -63,6 +64,8 @@ public class ZoneEffectSimple : MonoBehaviour
     [Tooltip("Zostanie wywołane po birdRespawnDelay od udanego mashu. " +
              "Podepnij tutaj np. RandomSpawner2D.SpawnObjects() albo własny manager.")]
     public UnityEvent OnRespawnRequested;
+    
+    [field: SerializeField] public EventReference SFX { get; private set; }
 
     [Header("Debug")]
     public bool debugLogs = true;
@@ -175,6 +178,7 @@ public class ZoneEffectSimple : MonoBehaviour
         mashValue = 0f;
         interruptedByMash = false;
         isEffectActive = true;
+        AudioManager.Instance.PlayOneShot(SFX);
         PushMashToUI();
 
         disabledScript = DisableTargetComponentOnPlayer(player);

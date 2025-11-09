@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{843849c5-9e27-4e6a-bb85-3d4238d932eb}">
+		<property name="assetPath">
+			<value>Bells, Gong, Kung Fu, Metal, Hit 01 SND45867.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>96</value>
+		</property>
+		<property name="channelCount">
+			<value>1</value>
+		</property>
+		<property name="length">
+			<value>3.2691666666666666</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{02370e55-d752-4a4e-a3ce-0689a59fe425}</destination>
+		</relationship>
+	</object>
+</objects>

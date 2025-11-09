@@ -23,6 +23,11 @@ public class FMODEvents : MonoBehaviour
     [field: SerializeField] public EventReference DogRun { get; private set; }
     [field: SerializeField] public EventReference KaczkaQuak { get; private set; }
     [field: SerializeField] public EventReference DziadMumble { get; private set; }
+    [field: SerializeField] public EventReference Listonosz { get; private set; }
+    [field: SerializeField] public EventReference Kret { get; private set; }
+    [field: SerializeField] public EventReference CzasTykanie { get; private set; }
+    [field: SerializeField] public EventReference SuccesSfx { get; private set; }
+    [field: SerializeField] public EventReference FailureSFX { get; private set; }
     public static FMODEvents Instance { get; private set; }
 
     private void Awake()
