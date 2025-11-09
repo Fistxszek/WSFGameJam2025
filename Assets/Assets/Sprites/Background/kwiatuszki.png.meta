@@ -228,9 +228,9 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: d4f6878948ff84f90800000000000000
+      spriteID: d8bb130fc9ec73442a035ab7371e0ebc
       internalID: -6969039478397046963
       vertices: []
       indices: 
