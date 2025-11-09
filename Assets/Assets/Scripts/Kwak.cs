@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using FMODUnity;
 using UnityEngine.UI;
 using TMPro; // dla MatchTextPreferred (opcjonalnie)
 
@@ -39,6 +40,8 @@ public class Kwak : MonoBehaviour
     [Min(0f)] public float bannerPulseFrequency = 3.0f;
     public bool bannerUseUnscaledTime = true;
     public CanvasGroup bannerCanvasGroup;
+    
+    [field: SerializeField] public EventReference SFX { get; private set; }
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     // INTUICYJNY ROZMIAR BANERU
@@ -182,6 +185,7 @@ public class Kwak : MonoBehaviour
 
         ShowEffectBanner(); // pokaż + rozmiar
 
+        AudioManager.Instance.PlayOneShoot(SFX);
         if (homingRoutine == null)
             homingRoutine = StartCoroutine(HomingToThisObject());
     }

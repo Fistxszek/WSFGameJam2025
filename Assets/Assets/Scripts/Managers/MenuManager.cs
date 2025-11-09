@@ -12,6 +12,7 @@ public class MenuManager : MonoBehaviour
 
     public void OnStartGameBtn()
     {
+        AudioManager.Instance.StopAllSounds();
         SceneManager.LoadScene(1, LoadSceneMode.Single);
     }
     
