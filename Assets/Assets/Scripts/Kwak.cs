@@ -66,6 +66,12 @@ public class Kwak : MonoBehaviour
     public float aspect = 4.0f;
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+    
+    [SerializeField] private Animator _mashUiAnimator;
+    [SerializeField] private GameObject _mashUi;
+    [SerializeField] private GameObject _lockUi;
+    
+    
     [Header("Debug")]
     public bool debugLogs = true;
 
@@ -185,7 +191,9 @@ public class Kwak : MonoBehaviour
 
         ShowEffectBanner(); // pokaż + rozmiar
 
+        _mashUi.SetActive(true);
         AudioManager.Instance.PlayOneShoot(SFX);
+        AudioManager.Instance.PlayOneShoot(FMODEvents.Instance.SzczekSet);
         if (homingRoutine == null)
             homingRoutine = StartCoroutine(HomingToThisObject());
     }
@@ -200,6 +208,8 @@ public class Kwak : MonoBehaviour
             // --- Mash E ---
             if (Input.GetKeyDown(mashKey))
             {
+                _mashUiAnimator.SetTrigger("Pressed");
+                AudioManager.Instance.PlayOneShoot(FMODEvents.Instance.Click);
                 mashValue = Mathf.Min(1f, mashValue + mashPerPress);
                 PushMashUI();
                 if (debugLogs) Debug.Log($"[Kwak] Mash {mashKey}: {mashValue:0.00}");
@@ -213,6 +223,7 @@ public class Kwak : MonoBehaviour
             if (mashValue >= 0.99f)
             {
                 if (debugLogs) Debug.Log("[Kwak] Uwolniono się mashowaniem – przerywam ruch.");
+                _mashUi.SetActive(false);
                 break;
             }
 
@@ -223,6 +234,7 @@ public class Kwak : MonoBehaviour
                 if (elapsed >= maxHomingDuration)
                 {
                     if (debugLogs) Debug.Log("[Kwak] Limit czasu – stop.");
+                    _mashUi.SetActive(false);
                     break;
                 }
             }
@@ -234,8 +246,11 @@ public class Kwak : MonoBehaviour
             if (dir.sqrMagnitude <= stopDistance * stopDistance)
             {
                 if (debugLogs) Debug.Log("[Kwak] Gracz dotarł do emitera.");
+                _mashUi.SetActive(false);
+                _lockUi.SetActive(true);
                 if (holdAtTargetSeconds > 0f)
                     yield return new WaitForSeconds(holdAtTargetSeconds);
+                _lockUi.SetActive(false);
                 break;
             }
 

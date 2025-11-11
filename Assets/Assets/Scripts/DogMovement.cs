@@ -164,7 +164,7 @@ public class DogMovement : MonoBehaviour
         if (other.CompareTag("Jezioro"))
         {
             _animator.SetBool("isSwimming", true);
-            _currentSpeedMulti = 0.5f;
+            _currentSpeedMulti = _slowWalkSpeed;
             Debug.Log("plywanie");
         }
 

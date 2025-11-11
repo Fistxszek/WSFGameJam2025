@@ -49,7 +49,7 @@ public class TimerManager : MonoBehaviour
             {
                 timeRemaining -= Time.deltaTime;
                 OnTimerTick?.Invoke(timeRemaining);
-                if (timeRemaining <= 10 && _isPlayingSfx)
+                if (timeRemaining <= 10 && !_isPlayingSfx)
                 {
                    AudioManager.Instance.PlayOneShot(FMODEvents.Instance.CzasTykanie);
                    _isPlayingSfx = true;

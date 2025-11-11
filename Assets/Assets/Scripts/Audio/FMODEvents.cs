@@ -28,6 +28,7 @@ public class FMODEvents : MonoBehaviour
     [field: SerializeField] public EventReference CzasTykanie { get; private set; }
     [field: SerializeField] public EventReference SuccesSfx { get; private set; }
     [field: SerializeField] public EventReference FailureSFX { get; private set; }
+    [field: SerializeField] public EventReference SzczekSet { get; private set; }
     public static FMODEvents Instance { get; private set; }
 
     private void Awake()

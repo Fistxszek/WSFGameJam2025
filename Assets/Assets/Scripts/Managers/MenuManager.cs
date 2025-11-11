@@ -8,21 +8,25 @@ public class MenuManager : MonoBehaviour
     private void Start()
     {
         AudioManager.Instance.InitializeMusic(FMODEvents.Instance.MenuMusic);
+        AudioManager.Instance.PlayOneShoot(FMODEvents.Instance.Click);
     }
 
     public void OnStartGameBtn()
     {
+        AudioManager.Instance.PlayOneShoot(FMODEvents.Instance.Click);
         AudioManager.Instance.StopAllSounds();
-        SceneManager.LoadScene(1, LoadSceneMode.Single);
+        SceneManager.LoadScene(2, LoadSceneMode.Single);
     }
     
     public void OnCreditsBtn()
     {
+        AudioManager.Instance.PlayOneShoot(FMODEvents.Instance.Click);
         _creditsObj.SetActive(!_creditsObj.activeSelf);
     }
 
     public void OnButtonExit()
     {
+        AudioManager.Instance.PlayOneShoot(FMODEvents.Instance.Click);
         Application.Quit();
     }
 }

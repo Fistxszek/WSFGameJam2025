@@ -38,12 +38,14 @@ public class GameManager : MonoBehaviour
     public void OnPlayAgainBtn()
     {
         Time.timeScale = 1f;
+        AudioManager.Instance.PlayOneShoot(FMODEvents.Instance.Click);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
     }
 
     public void OnMainMenuBtn()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(0, LoadSceneMode.Single);
+        AudioManager.Instance.PlayOneShoot(FMODEvents.Instance.Click);
+        SceneManager.LoadScene(1, LoadSceneMode.Single);
     }
 }

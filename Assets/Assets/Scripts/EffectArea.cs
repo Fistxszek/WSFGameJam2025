@@ -107,6 +107,9 @@ public class ZoneEffectSimple : MonoBehaviour
 
     private float mashValue = 0f;
     private bool interruptedByMash = false;
+    [SerializeField] private Animator _mashUiAnimator;
+    [SerializeField] private GameObject _mashUi;
+    [SerializeField] private GameObject _lockUI;
 
     private void Start()
     {
@@ -203,6 +206,7 @@ public class ZoneEffectSimple : MonoBehaviour
         interruptedByMash = false;
         isEffectActive = true;
         AudioManager.Instance.PlayOneShot(SFX);
+        AudioManager.Instance.PlayOneShoot(FMODEvents.Instance.SzczekSet);
         PushMashToUI();
 
         disabledScript = DisableTargetComponentOnPlayer(player);
@@ -292,6 +296,7 @@ public class ZoneEffectSimple : MonoBehaviour
     // --------- Ruch + Mash ---------
     private IEnumerator MovePlayerToBirdWithMash(GameObject player)
     {
+        _mashUi.SetActive(true);
         float elapsed = 0f;
         float takeoverT = 0f;
         var rb = player != null ? player.GetComponent<Rigidbody2D>() : null;
@@ -304,6 +309,8 @@ public class ZoneEffectSimple : MonoBehaviour
             if (Input.GetKeyDown(mashKey))
             {
                 mashValue = Mathf.Min(1f, mashValue + mashPerPress);
+                _mashUiAnimator.SetTrigger("Pressed");
+                AudioManager.Instance.PlayOneShoot(FMODEvents.Instance.Click);
                 PushMashToUI();
                 if (debugLogs) Debug.Log($"[Zone] Mash {mashKey}: {mashValue:0.00}");
             }
@@ -320,6 +327,7 @@ public class ZoneEffectSimple : MonoBehaviour
             {
                 interruptedByMash = true;
                 if (debugLogs) Debug.Log("[Zone] Ucieczka: efekt przerwany mashowaniem.");
+                _mashUi.SetActive(false);
                 break;
             }
 
@@ -352,11 +360,14 @@ public class ZoneEffectSimple : MonoBehaviour
                 if (dir.sqrMagnitude <= (stopDistance * stopDistance))
                 {
                     if (debugLogs) Debug.Log("[Zone] Dotarto do celu (ptak zostaje).");
+                    _mashUi.SetActive(false);
+                    _lockUI.SetActive(true);
                     if (rb != null) rb.linearVelocity = Vector2.zero;
 
                     if (holdAtTargetSeconds > 0f)
                         yield return new WaitForSeconds(holdAtTargetSeconds);
 
+                    _lockUI.SetActive(false);
                     var birds = GameObject.FindGameObjectsWithTag(birdTag);
                     for (int i = 0; i < birds.Length; i++)
                         if (birds[i] != null) Destroy(birds[i]);
